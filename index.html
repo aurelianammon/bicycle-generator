@@ -68,7 +68,7 @@
 				displayConditionalEdges: true,
 				thickness: 2.5,
 				useThickLines: true,
-				model: 'BIKE',
+				model: 'FRAME',
 
 				randomize: () => randomizeColors(),
 			};
@@ -448,7 +448,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( LIGHT_BACKGROUND );
 
-				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 2000 );
 				camera.position.set( -1, 0.5, 2 ).multiplyScalar( 0.75 );
 				scene.add( camera );
 
@@ -486,12 +486,6 @@
 
 				scene.add( dirLight );
 
-				const cylinder = new THREE.Group();
-				cylinder.add( new THREE.Mesh( new THREE.CylinderBufferGeometry( 0.25, 0.25, 0.5, 100 ) ) );
-				cylinder.children[ 0 ].geometry.computeBoundingBox();
-				cylinder.children[ 0 ].castShadow = true;
-				models.CYLINDER = cylinder;
-
 				models.HELMET = null;
 				new GLTFLoader().load(
 					'https://rawgit.com/KhronosGroup/glTF-Sample-Models/master/2.0/FlightHelmet/glTF/FlightHelmet.gltf',
@@ -507,16 +501,46 @@
 					}
 				);
 
-				models.BIKE = null;
+				models.WHEEL = null;
 				new GLTFLoader().load(
-					'./models/lotus_bike.gltf',
+					'./models/parts/wheel.gltf',
 					gltf => {
 
 						const model = mergeObject( gltf.scene );
 						model.children[ 0 ].geometry.computeBoundingBox();
 						model.children[ 0 ].castShadow = true;
 
-						models.BIKE = model;
+						models.WHEEL = model;
+						updateModel();
+
+					}
+				);
+
+				models.FRAME = null;
+				new GLTFLoader().load(
+					'./models/parts/frame.gltf',
+					gltf => {
+
+						const model = mergeObject( gltf.scene );
+						model.children[ 0 ].geometry.computeBoundingBox();
+						model.children[ 0 ].castShadow = true;
+
+						models.FRAME = model;
+						updateModel();
+
+					}
+				);
+
+				models.HANDLEBAR = null;
+				new GLTFLoader().load(
+					'./models/parts/handlebar.gltf',
+					gltf => {
+
+						const model = mergeObject( gltf.scene );
+						model.children[ 0 ].geometry.computeBoundingBox();
+						model.children[ 0 ].castShadow = true;
+
+						models.HANDLEBAR = model;
 						updateModel();
 
 					}
