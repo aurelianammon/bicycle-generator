@@ -549,6 +549,21 @@
 					}
 				);
 
+				models.VIGORELLI = null;
+				new GLTFLoader().load(
+					'./models/parts/frame_vigorelli.gltf',
+					gltf => {
+
+						const model = mergeObject( gltf.scene );
+						model.children[ 0 ].geometry.computeBoundingBox();
+						model.children[ 0 ].castShadow = true;
+
+						models.VIGORELLI = model;
+						updateModel();
+
+					}
+				);
+
 
 				// camera controls
 				controls = new OrbitControls( camera, renderer.domElement );
