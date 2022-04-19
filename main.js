@@ -26,6 +26,8 @@ var configuration;
 
 var edgesModel, originalModel, backgroundModel, conditionalModel, shadowModel, floor, depthModel, gui;
 
+var angle;
+
 // globals
 var params = {
     colors: 'LIGHT',
@@ -114,15 +116,31 @@ function init() {
     loadModels();
 
     function waitForModels() {
-        if(Object.keys(model).length !== 4) {
+        if(Object.keys(model).length !== 5) {
             window.setTimeout(waitForModels, 100);
         } else {
             var pos = configuration.frame.position;
+
+            // add arrowhelpers
+            const dir = new THREE.Vector3( 0, -3, 0.8 );
+            const norm = new THREE.Vector3( 1, 0, 0 );
+            //normalize the direction vector (convert to vector of length 1)
+            dir.normalize();
+            const origin = new THREE.Vector3(pos[0], pos[1], pos[2]);
+            const length = 6;
+            const hex = 0x00ff00;
+            const arrowHelper = new THREE.ArrowHelper( dir, origin.clone().sub(dir), length, hex );
+            const arrowHelper_norm = new THREE.ArrowHelper( norm, origin, 2, 0x0000ff );
+            scene.add( arrowHelper );
+            scene.add( arrowHelper_norm );
+
+            angle = 0.5; //Math.PI / 7
             model.handlebar.position.set(pos[0], pos[1], pos[2]);
-            model.handlebar.rotation.y = Math.PI / 7;
-            model.front_wheel.position.set(0, 0, 2);
-            model.front_wheel.rotation.y = Math.PI / 7;
-            model.back_wheel.position.set(0, 0, -1.5);
+            model.handlebar.rotateAroundWorldAxis(origin, dir, angle);
+            model.front_wheel.position.set(0, 0, 1.86);
+            model.front_wheel.rotateAroundWorldAxis(origin, dir, angle);
+            model.fork.rotateAroundWorldAxis(origin, dir, angle);
+            model.back_wheel.position.set(0, 0.02, -1.95);
 
             const group = new THREE.Group();
 
@@ -140,17 +158,43 @@ function init() {
             console.log(scene);
         }
     }
+
     waitForModels();
     initGui();
 
 }
 
+THREE.Object3D.prototype.rotateAroundWorldAxis = function() {
+
+    // rotate object around axis in world space (the axis passes through point)
+    // axis is assumed to be normalized
+    // assumes object does not have a rotated parent
+
+    var q = new THREE.Quaternion();
+
+    return function rotateAroundWorldAxis( point, axis, angle ) {
+
+        q.setFromAxisAngle( axis, angle );
+
+        this.applyQuaternion( q );
+
+        this.position.sub( point );
+        this.position.applyQuaternion( q );
+        this.position.add( point );
+
+        return this;
+
+    }
+
+}();
+
 function createConfiguration(){
     configuration = {
-        frame: {name: 'frame', path: './models/parts/frame.obj', position: [0, 1.5, 1.7]},
-        front_wheel: {name: 'wheel', path: './models/parts/wheel.obj'},
-        back_wheel: {name: 'wheel', path: './models/parts/wheel.obj'},
-        handlebar: {name: 'handlebar', path: './models/parts/handlebar.obj'}
+        frame: {name: 'frame', path: './models/parts/frame_1.obj', position: [0, 1.87, 1.15]},
+        front_wheel: {name: 'wheel', path: './models/parts/front_wheel_1.obj'},
+        back_wheel: {name: 'wheel', path: './models/parts/back_wheel_1.obj'},
+        handlebar: {name: 'handlebar', path: './models/parts/handlebar.obj'},
+        fork: {name: 'fork', path: './models/parts/fork_1.obj'}
     }
 }
 
