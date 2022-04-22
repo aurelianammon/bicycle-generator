@@ -194,7 +194,10 @@ function createConfiguration(){
         front_wheel: {name: 'wheel', path: './models/parts/front_wheel_1.obj'},
         back_wheel: {name: 'wheel', path: './models/parts/back_wheel_1.obj'},
         handlebar: {name: 'handlebar', path: './models/parts/handlebar.obj'},
-        fork: {name: 'fork', path: './models/parts/fork_1.obj'}
+        fork: {name: 'fork', path: './models/parts/fork_1.obj'},
+        fork_prototype: {name: 'fork', path: './models/parts/fork_prototype.obj'},
+        frame_prototype: {name: 'fork', path: './models/parts/frame_prototype.obj'},
+        handlebars_prototype: {name: 'fork', path: './models/parts/handlebars_prototype.obj'},
     }
 }
 
