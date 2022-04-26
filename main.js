@@ -112,6 +112,17 @@ function init() {
     var gridXZ = new THREE.GridHelper(100, 10, new THREE.Color(0xff0000), new THREE.Color(0x000000));
     scene.add(gridXZ);
 
+    generate();
+    
+    initGui();
+
+}
+
+function generate() {
+
+    console.log("generate new model")
+    model = {};
+
     createConfiguration();
     loadModels();
 
@@ -119,6 +130,7 @@ function init() {
         if(Object.keys(model).length !== 5) {
             window.setTimeout(waitForModels, 100);
         } else {
+            console.log(model)
             var pos = configuration.frame.position;
 
             // add arrowhelpers
@@ -134,7 +146,7 @@ function init() {
             scene.add( arrowHelper );
             scene.add( arrowHelper_norm );
 
-            angle = 0.5; //Math.PI / 7
+            angle = Math.random() * 2 - 1;
             model.handlebar.position.set(pos[0], pos[1], pos[2]);
             model.handlebar.rotateAroundWorldAxis(origin, dir, angle);
             model.front_wheel.position.set(0, 0, 1.86);
@@ -149,6 +161,8 @@ function init() {
                 // scene.add(object);
             });
 
+            console.log(group)
+
             var object = mergeObject(group)
             object.children[0].material = new THREE.MeshStandardMaterial( { color: 0x009900 } );
             object.children[ 0 ].geometry.computeBoundingBox();
@@ -160,8 +174,6 @@ function init() {
     }
 
     waitForModels();
-    initGui();
-
 }
 
 THREE.Object3D.prototype.rotateAroundWorldAxis = function() {
@@ -188,17 +200,39 @@ THREE.Object3D.prototype.rotateAroundWorldAxis = function() {
 
 }();
 
+function randomElement (a) {
+    return a[Math.floor((Math.random()*a.length))];
+}
+
 function createConfiguration(){
+
+    // AdDD BIKEPARTS HERE IN THE ACCORDING ARRAY
+    var frames = [
+        {name: 'frame', path: './models/parts/frame_1.obj', position: [0, 1.85, 1.15]}
+    ]
+    var forks = [
+        {name: 'fork', path: './models/parts/fork_1.obj'}
+    ]
+    var front_wheels = [
+        {name: 'wheel', path: './models/parts/front_wheel_1.obj'}
+    ]
+    var back_wheels = [
+        {name: 'wheel', path: './models/parts/back_wheel_1.obj'}
+    ]
+    var handlebars = [
+        {name: 'handlebar', path: './models/parts/handlebars_prototype.obj'},
+        {name: 'handlebar', path: './models/parts/handlebar.obj'}
+    ]
+
     configuration = {
-        frame: {name: 'frame', path: './models/parts/frame_1.obj', position: [0, 1.87, 1.15]},
-        front_wheel: {name: 'wheel', path: './models/parts/front_wheel_1.obj'},
-        back_wheel: {name: 'wheel', path: './models/parts/back_wheel_1.obj'},
-        handlebar: {name: 'handlebar', path: './models/parts/handlebar.obj'},
-        fork: {name: 'fork', path: './models/parts/fork_1.obj'},
-        fork_prototype: {name: 'fork', path: './models/parts/fork_prototype.obj'},
-        frame_prototype: {name: 'fork', path: './models/parts/frame_prototype.obj'},
-        handlebars_prototype: {name: 'fork', path: './models/parts/handlebars_prototype.obj'},
+        frame: randomElement(frames),
+        front_wheel: randomElement(front_wheels),
+        back_wheel: randomElement(back_wheels),
+        handlebar: randomElement(handlebars),
+        fork: randomElement(forks)
     }
+
+    console.log(configuration);
 }
 
 function loadModels() {
@@ -713,7 +747,7 @@ function initGui() {
 
     modelFolder.add( params, 'lit' );
 
-    modelFolder.open();
+    // modelFolder.open();
 
     const linesFolder = gui.addFolder( 'conditional lines' );
 
@@ -772,5 +806,7 @@ function initGui() {
 
     cameraFolder.open();
 
-    gui.open();
+    gui.close();
 }
+
+document.getElementById ("generate").addEventListener ("click", generate, false);
