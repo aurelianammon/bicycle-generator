@@ -208,16 +208,19 @@ function createConfiguration(){
 
     // AdDD BIKEPARTS HERE IN THE ACCORDING ARRAY
     var frames = [
-        {name: 'frame', path: './models/parts/frame_1.obj', position: [0, 1.85, 1.15]}
+        {name: 'frame', path: './models/parts/frame_01_vigorelli.obj', position: [0, 1.87, 1.20]},
+        {name: 'frame', path: './models/parts/frame_02_super_pista.obj', position: [0, 1.9, 1.20]}
     ]
     var forks = [
         {name: 'fork', path: './models/parts/fork_1.obj'}
     ]
     var front_wheels = [
-        {name: 'wheel', path: './models/parts/front_wheel_1.obj'}
+        {name: 'wheel', path: './models/parts/front_wheel_1.obj'},
+        {name: 'wheel', path: './models/parts/wheel_01_test.obj'}
     ]
     var back_wheels = [
-        {name: 'wheel', path: './models/parts/back_wheel_1.obj'}
+        {name: 'wheel', path: './models/parts/back_wheel_1.obj'},
+        {name: 'wheel', path: './models/parts/wheel_01_test.obj'}
     ]
     var handlebars = [
         {name: 'handlebar', path: './models/parts/handlebars_prototype.obj'},
