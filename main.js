@@ -149,10 +149,10 @@ function generate() {
             angle = Math.random() * 2 - 1;
             model.handlebar.position.set(pos[0], pos[1], pos[2]);
             model.handlebar.rotateAroundWorldAxis(origin, dir, angle);
-            model.front_wheel.position.set(0, 0, 1.86);
+            model.front_wheel.position.set(0, 0, 0.99);
             model.front_wheel.rotateAroundWorldAxis(origin, dir, angle);
             model.fork.rotateAroundWorldAxis(origin, dir, angle);
-            model.back_wheel.position.set(0, 0.02, -1.95);
+            model.back_wheel.position.set(0, 0.02, -0.99);
 
             const group = new THREE.Group();
 
@@ -208,23 +208,22 @@ function createConfiguration(){
 
     // AdDD BIKEPARTS HERE IN THE ACCORDING ARRAY
     var frames = [
-        {name: 'frame', path: './models/parts/frame_01_vigorelli.obj', position: [0, 1.87, 1.20]},
-        {name: 'frame', path: './models/parts/frame_02_super_pista.obj', position: [0, 1.9, 1.20]}
+        {name: 'frame', path: './models/parts/frame_01_vigorelli.obj', position: [0, 0.95, 0.65]},
+        {name: 'frame', path: './models/parts/frame_02_super_pista.obj', position: [0, 0.95, 0.64]},
+
     ]
     var forks = [
-        {name: 'fork', path: './models/parts/fork_1.obj'}
+        {name: 'fork', path: './models/parts/fork_01.obj'},
+        {name: 'fork', path: './models/parts/fork_02.obj'}
     ]
     var front_wheels = [
-        {name: 'wheel', path: './models/parts/front_wheel_1.obj'},
-        {name: 'wheel', path: './models/parts/wheel_01_test.obj'}
+        {name: 'wheel', path: './models/parts/wheel_01.obj'}
     ]
     var back_wheels = [
-        {name: 'wheel', path: './models/parts/back_wheel_1.obj'},
-        {name: 'wheel', path: './models/parts/wheel_01_test.obj'}
+        {name: 'wheel', path: './models/parts/wheel_01.obj'}
     ]
     var handlebars = [
-        {name: 'handlebar', path: './models/parts/handlebars_prototype.obj'},
-        {name: 'handlebar', path: './models/parts/handlebar.obj'}
+        {name: 'handlebar', path: './models/parts/handlebar_02.obj'},
     ]
 
     configuration = {
