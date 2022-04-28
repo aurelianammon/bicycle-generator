@@ -217,10 +217,16 @@ function createConfiguration(){
         {name: 'fork', path: './models/parts/fork_02.obj'}
     ]
     var front_wheels = [
-        {name: 'wheel', path: './models/parts/wheel_01.obj'}
+        {name: 'wheel', path: './models/parts/wheel_01.obj'},
+        {name: 'wheel', path: './models/parts/wheel_02.obj'},
+        {name: 'wheel', path: './models/parts/wheel_03.obj'},
+        {name: 'wheel', path: './models/parts/wheel_04.obj'}
     ]
     var back_wheels = [
-        {name: 'wheel', path: './models/parts/wheel_01.obj'}
+        {name: 'wheel', path: './models/parts/wheel_01.obj'},
+        {name: 'wheel', path: './models/parts/wheel_02.obj'},
+        {name: 'wheel', path: './models/parts/wheel_03.obj'},
+        {name: 'wheel', path: './models/parts/wheel_04.obj'}
     ]
     var handlebars = [
         {name: 'handlebar', path: './models/parts/handlebar_02.obj'},
