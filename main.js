@@ -149,7 +149,7 @@ function generate() {
             angle = Math.random() * 2 - 1;
             model.handlebar.position.set(pos[0], pos[1], pos[2]);
             model.handlebar.rotateAroundWorldAxis(origin, dir, angle);
-            model.front_wheel.position.set(0, 0, 0.99);
+            model.front_wheel.position.set(0, 0, 1.00);
             model.front_wheel.rotateAroundWorldAxis(origin, dir, angle);
             model.fork.rotateAroundWorldAxis(origin, dir, angle);
             model.back_wheel.position.set(0, 0.02, -0.99);
@@ -210,11 +210,15 @@ function createConfiguration(){
     var frames = [
         {name: 'frame', path: './models/parts/frame_01_vigorelli.obj', position: [0, 0.95, 0.65]},
         {name: 'frame', path: './models/parts/frame_02_super_pista.obj', position: [0, 0.95, 0.64]},
+        {name: 'frame', path: './models/parts/frame_03_barcelona.obj', position: [0, 0.90, 0.60]},
+        {name: 'frame', path: './models/parts/frame_04_barcelona_low_pro.obj', position: [0, 0.90, 0.63]},
+        {name: 'frame', path: './models/parts/frame_05_barcelona_prototype.obj', position: [0, 0.90, 0.63]},
 
     ]
     var forks = [
         {name: 'fork', path: './models/parts/fork_01.obj'},
-        {name: 'fork', path: './models/parts/fork_02.obj'}
+        {name: 'fork', path: './models/parts/fork_02.obj'},
+        {name: 'fork', path: './models/parts/fork_03.obj'},
     ]
     var front_wheels = [
         {name: 'wheel', path: './models/parts/wheel_01.obj'},
