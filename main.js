@@ -33,6 +33,35 @@ var angle;
 
 var helpers = true;
 
+// AdDD BIKEPARTS HERE IN THE ACCORDING ARRAY
+var frames = [
+    {name: 'frame', path: './models/parts/frame_01_vigorelli.obj', position: [0, 0.95, 0.65]},
+    {name: 'frame', path: './models/parts/frame_02_super_pista.obj', position: [0, 0.95, 0.64]},
+    {name: 'frame', path: './models/parts/frame_03_barcelona.obj', position: [0, 0.90, 0.60]},
+    {name: 'frame', path: './models/parts/frame_04_barcelona_low_pro.obj', position: [0, 0.90, 0.63]},
+    {name: 'frame', path: './models/parts/frame_05_barcelona_prototype.obj', position: [0, 0.90, 0.63]},
+]
+var forks = [
+    {name: 'fork', path: './models/parts/fork_01.obj'},
+    {name: 'fork', path: './models/parts/fork_02.obj'},
+    {name: 'fork', path: './models/parts/fork_03.obj'},
+]
+var front_wheels = [
+    {name: 'wheel', path: './models/parts/wheel_01.obj'},
+    {name: 'wheel', path: './models/parts/wheel_02.obj'},
+    {name: 'wheel', path: './models/parts/wheel_03.obj'},
+    {name: 'wheel', path: './models/parts/wheel_04.obj'}
+]
+var back_wheels = [
+    {name: 'wheel', path: './models/parts/wheel_01.obj'},
+    {name: 'wheel', path: './models/parts/wheel_02.obj'},
+    {name: 'wheel', path: './models/parts/wheel_03.obj'},
+    {name: 'wheel', path: './models/parts/wheel_04.obj'}
+]
+var handlebars = [
+    {name: 'handlebar', path: './models/parts/handlebar_02.obj'},
+]
+
 // globals
 var params = {
     colors: 'LIGHT',
@@ -70,6 +99,8 @@ init();
 animate();
 
 function init() {
+
+    possibilities();
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0xffffff );
@@ -218,38 +249,7 @@ function randomElement (a) {
     return a[Math.floor((Math.random()*a.length))];
 }
 
-function createConfiguration(){
-
-    // AdDD BIKEPARTS HERE IN THE ACCORDING ARRAY
-    var frames = [
-        {name: 'frame', path: './models/parts/frame_01_vigorelli.obj', position: [0, 0.95, 0.65]},
-        {name: 'frame', path: './models/parts/frame_02_super_pista.obj', position: [0, 0.95, 0.64]},
-        {name: 'frame', path: './models/parts/frame_03_barcelona.obj', position: [0, 0.90, 0.60]},
-        {name: 'frame', path: './models/parts/frame_04_barcelona_low_pro.obj', position: [0, 0.90, 0.63]},
-        {name: 'frame', path: './models/parts/frame_05_barcelona_prototype.obj', position: [0, 0.90, 0.63]},
-
-    ]
-    var forks = [
-        {name: 'fork', path: './models/parts/fork_01.obj'},
-        {name: 'fork', path: './models/parts/fork_02.obj'},
-        {name: 'fork', path: './models/parts/fork_03.obj'},
-    ]
-    var front_wheels = [
-        {name: 'wheel', path: './models/parts/wheel_01.obj'},
-        {name: 'wheel', path: './models/parts/wheel_02.obj'},
-        {name: 'wheel', path: './models/parts/wheel_03.obj'},
-        {name: 'wheel', path: './models/parts/wheel_04.obj'}
-    ]
-    var back_wheels = [
-        {name: 'wheel', path: './models/parts/wheel_01.obj'},
-        {name: 'wheel', path: './models/parts/wheel_02.obj'},
-        {name: 'wheel', path: './models/parts/wheel_03.obj'},
-        {name: 'wheel', path: './models/parts/wheel_04.obj'}
-    ]
-    var handlebars = [
-        {name: 'handlebar', path: './models/parts/handlebar_02.obj'},
-    ]
-
+function createConfiguration() {
     configuration = {
         frame: randomElement(frames),
         front_wheel: randomElement(front_wheels),
@@ -877,6 +877,11 @@ function toggleHelpers (e) {
         scene.remove( arrowHelper_norm );
         renderer.render( scene, camera );
     }
+}
+
+function possibilities () {
+    var number = frames.length * back_wheels.length * front_wheels.length * handlebars.length * forks.length;
+    document.getElementById ("number").textContent = number;
 }
 
 document.getElementById ("generate").addEventListener ("click", generate, false);
