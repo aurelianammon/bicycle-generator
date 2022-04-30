@@ -69,7 +69,8 @@ var back_wheels = [
     {name: 'disk', path: './models/parts/wheel_04.obj'}
 ]
 var handlebars = [
-    {name: 'deep', path: './models/parts/handlebar_02.obj'},
+    {name: 'deep', path: './models/parts/handlebar_01.obj'},
+    {name: 'narrow', path: './models/parts/handlebar_02.obj'},
 ]
 
 // globals
