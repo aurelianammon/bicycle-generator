@@ -31,6 +31,8 @@ var gridXZ, arrowHelper, arrowHelper_norm
 
 var angle;
 
+var helpers = true;
+
 // globals
 var params = {
     colors: 'LIGHT',
@@ -80,13 +82,13 @@ function init() {
         preserveDrawingBuffer : true // required to support .toDataURL()
     });
     renderer.setClearColor( 0x000000, 0 );
-    renderer.setPixelRatio( window.devicePixelRatio * 3 );
+    renderer.setPixelRatio( window.devicePixelRatio * 2 );
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.shadowMap.enabled = true;
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild( renderer.domElement );
 
-    camera.position.set(5,5,5);
+    camera.position.set(2,2,2);
 
     // Floor
     floor = new THREE.Mesh(
@@ -147,14 +149,16 @@ function generate() {
             //normalize the direction vector (convert to vector of length 1)
             dir.normalize();
             const origin = new THREE.Vector3(pos[0], pos[1], pos[2]);
-            const length = 6;
+            const length = 4;
             const hex = 0x00ff00;
             scene.remove( arrowHelper );
             scene.remove( arrowHelper_norm );
             arrowHelper = new THREE.ArrowHelper( dir, origin.clone().sub(dir), length, hex );
             arrowHelper_norm = new THREE.ArrowHelper( norm, origin, 2, 0x0000ff );
-            scene.add( arrowHelper );
-            scene.add( arrowHelper_norm );
+            if (helpers) {
+                scene.add( arrowHelper );
+                scene.add( arrowHelper_norm );
+            }
 
             angle = Math.random() * 2 - 1;
             model.handlebar.position.set(pos[0], pos[1], pos[2]);
@@ -849,12 +853,32 @@ function exportBike(e) {
     console.log(dataUrl)
 
     // renderer.setPixelRatio( window.devicePixelRatio * 2 );
-    scene.add(gridXZ)
-    scene.add( arrowHelper );
-    scene.add( arrowHelper_norm );
+    if (helpers) {
+        scene.add(gridXZ)
+        scene.add( arrowHelper );
+        scene.add( arrowHelper_norm );
+    }
     scene.background = temp_back;
     renderer.render( scene, camera );
 }
 
+function toggleHelpers (e) {
+    helpers = !helpers;
+    if(helpers) {
+        e.target.textContent = "Remove Helpers";
+        scene.add(gridXZ)
+        scene.add( arrowHelper );
+        scene.add( arrowHelper_norm );
+        renderer.render( scene, camera );
+    } else {
+        e.target.textContent = "Add Helpers";
+        scene.remove(gridXZ)
+        scene.remove( arrowHelper );
+        scene.remove( arrowHelper_norm );
+        renderer.render( scene, camera );
+    }
+}
+
 document.getElementById ("generate").addEventListener ("click", generate, false);
 document.getElementById ("export").addEventListener ("click", exportBike, false);
+document.getElementById ("toggle").addEventListener ("click", toggleHelpers, false);
