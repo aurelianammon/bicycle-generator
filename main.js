@@ -32,6 +32,7 @@ var gridXZ, arrowHelper, arrowHelper_norm
 var angle;
 
 var helpers = false;
+var rotate = true;
 
 // AdDD BIKEPARTS HERE IN THE ACCORDING ARRAY
 var frames = [
@@ -161,8 +162,9 @@ function init() {
 
     // camera controls
     controls = new OrbitControls( camera, renderer.domElement );
-    controls.target.set( 0, 0.2, 0 );
+    controls.target.set( 0, 0.3, 0 );
     controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.5;
 
     gridXZ = new THREE.GridHelper(100, 10, new THREE.Color(0xff0000), new THREE.Color(0x000000));
     if (helpers) {
@@ -914,9 +916,21 @@ function updateName() {
     document.getElementById ("name").textContent = name;
 }
 
+function toggleRotate (e) {
+    rotate = !rotate;
+    if (rotate) {
+        document.getElementById ("rotate").textContent = "Stop Rotation";
+        controls.autoRotate = true; 
+    } else {
+        document.getElementById ("rotate").textContent = "Start Rotation";
+        controls.autoRotate = false;  
+    }
+}
+
 document.getElementById ("generate").addEventListener ("click", generate, false);
 document.getElementById ("export").addEventListener ("click", exportBike, false);
 document.getElementById ("toggle").addEventListener ("click", toggleHelpers, false);
+document.getElementById ("rotate").addEventListener ("click", toggleRotate, false);
 
 window.addEventListener( 'resize', onWindowResize, false );
 
