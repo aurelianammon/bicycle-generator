@@ -161,6 +161,7 @@ function init() {
     // camera controls
     controls = new OrbitControls( camera, renderer.domElement );
     controls.target.set( 0, 0.2, 0 );
+    controls.autoRotate = true;
 
     gridXZ = new THREE.GridHelper(100, 10, new THREE.Color(0xff0000), new THREE.Color(0x000000));
     if (helpers) {
