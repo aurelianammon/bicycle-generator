@@ -1,6 +1,10 @@
 body { margin: 0; }
 
-#generate {
-    margin: 10px;
+#navigation {
     position: absolute;
+}
+
+button {
+    margin: 10px;
+    position: relative;
 }
