@@ -26,6 +26,9 @@ var configuration;
 
 var edgesModel, originalModel, backgroundModel, conditionalModel, shadowModel, floor, depthModel, gui;
 
+//helpers
+var gridXZ, arrowHelper, arrowHelper_norm
+
 var angle;
 
 // globals
@@ -33,7 +36,7 @@ var params = {
     colors: 'LIGHT',
     backgroundColor: '#0d2a28',
     modelColor: '#0d2a28',
-    lineColor: '#ffb400',
+    lineColor: '#000000',
     shadowColor: '#44491f',
 
     lit: false,
@@ -53,7 +56,7 @@ const color2 = new THREE.Color();
 
 const LIGHT_BACKGROUND = 0xeeeeee;
 const LIGHT_MODEL = 0xffffff;
-const LIGHT_LINES = 0x455A64;
+const LIGHT_LINES = 0x000000;
 const LIGHT_SHADOW = 0xc4c9cb;
 
 const DARK_BACKGROUND = 0x111111;
@@ -76,7 +79,8 @@ function init() {
         alpha: true,
         preserveDrawingBuffer : true // required to support .toDataURL()
     });
-    renderer.setPixelRatio( window.devicePixelRatio * 2 );
+    renderer.setClearColor( 0x000000, 0 );
+    renderer.setPixelRatio( window.devicePixelRatio * 3 );
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.shadowMap.enabled = true;
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -113,7 +117,7 @@ function init() {
     // camera controls
     controls = new OrbitControls( camera, renderer.domElement );
 
-    var gridXZ = new THREE.GridHelper(100, 10, new THREE.Color(0xff0000), new THREE.Color(0x000000));
+    gridXZ = new THREE.GridHelper(100, 10, new THREE.Color(0xff0000), new THREE.Color(0x000000));
     scene.add(gridXZ);
 
     generate();
@@ -145,8 +149,10 @@ function generate() {
             const origin = new THREE.Vector3(pos[0], pos[1], pos[2]);
             const length = 6;
             const hex = 0x00ff00;
-            const arrowHelper = new THREE.ArrowHelper( dir, origin.clone().sub(dir), length, hex );
-            const arrowHelper_norm = new THREE.ArrowHelper( norm, origin, 2, 0x0000ff );
+            scene.remove( arrowHelper );
+            scene.remove( arrowHelper_norm );
+            arrowHelper = new THREE.ArrowHelper( dir, origin.clone().sub(dir), length, hex );
+            arrowHelper_norm = new THREE.ArrowHelper( norm, origin, 2, 0x0000ff );
             scene.add( arrowHelper );
             scene.add( arrowHelper_norm );
 
@@ -826,12 +832,28 @@ function initGui() {
 }
 
 function exportBike(e) {
+
+    // no background
+    // renderer.setPixelRatio( window.devicePixelRatio * 4 );
+    var temp_back = scene.background;
+    scene.remove(gridXZ);
+    scene.remove( arrowHelper );
+    scene.remove( arrowHelper_norm );
+    scene.background = null;
+    renderer.render( scene, camera );
     var dataUrl = renderer.domElement.toDataURL("image/png");
     var link = document.createElement('a');
     link.download = "my-image.png";
     link.href = dataUrl;
     link.click();
     console.log(dataUrl)
+
+    // renderer.setPixelRatio( window.devicePixelRatio * 2 );
+    scene.add(gridXZ)
+    scene.add( arrowHelper );
+    scene.add( arrowHelper_norm );
+    scene.background = temp_back;
+    renderer.render( scene, camera );
 }
 
 document.getElementById ("generate").addEventListener ("click", generate, false);
