@@ -31,35 +31,45 @@ var gridXZ, arrowHelper, arrowHelper_norm
 
 var angle;
 
-var helpers = true;
+var helpers = false;
 
 // AdDD BIKEPARTS HERE IN THE ACCORDING ARRAY
 var frames = [
-    {name: 'frame', path: './models/parts/frame_01_vigorelli.obj', position: [0, 0.95, 0.65]},
-    {name: 'frame', path: './models/parts/frame_02_super_pista.obj', position: [0, 0.95, 0.64]},
-    {name: 'frame', path: './models/parts/frame_03_barcelona.obj', position: [0, 0.90, 0.60]},
-    {name: 'frame', path: './models/parts/frame_04_barcelona_low_pro.obj', position: [0, 0.90, 0.63]},
-    {name: 'frame', path: './models/parts/frame_05_barcelona_prototype.obj', position: [0, 0.90, 0.63]},
+    {name: 'vigorelli', path: './models/parts/frame_01_vigorelli.obj',
+        position: [0, 0.95, 0.65]
+    },
+    {name: 'super', path: './models/parts/frame_02_super_pista.obj',
+        position: [0, 0.95, 0.64]
+    },
+    {name: 'barcelona', path: './models/parts/frame_03_barcelona.obj',
+        position: [0, 0.90, 0.60]
+    },
+    {name: 'profesional', path: './models/parts/frame_04_barcelona_low_pro.obj',
+        position: [0, 0.90, 0.63]
+    },
+    {name: 'prototype', path: './models/parts/frame_05_barcelona_prototype.obj',
+        position: [0, 0.90, 0.63]
+    },
 ]
 var forks = [
-    {name: 'fork', path: './models/parts/fork_01.obj'},
-    {name: 'fork', path: './models/parts/fork_02.obj'},
-    {name: 'fork', path: './models/parts/fork_03.obj'},
+    {name: 'standart', path: './models/parts/fork_01.obj'},
+    {name: 'extended', path: './models/parts/fork_02.obj'},
+    {name: 'thin', path: './models/parts/fork_03.obj'},
 ]
 var front_wheels = [
-    {name: 'wheel', path: './models/parts/wheel_01.obj'},
-    {name: 'wheel', path: './models/parts/wheel_02.obj'},
-    {name: 'wheel', path: './models/parts/wheel_03.obj'},
-    {name: 'wheel', path: './models/parts/wheel_04.obj'}
+    {name: 'sensible', path: './models/parts/wheel_01.obj'},
+    {name: 'wheeler', path: './models/parts/wheel_02.obj'},
+    {name: 'vampire', path: './models/parts/wheel_03.obj'},
+    {name: 'disk', path: './models/parts/wheel_04.obj'}
 ]
 var back_wheels = [
-    {name: 'wheel', path: './models/parts/wheel_01.obj'},
-    {name: 'wheel', path: './models/parts/wheel_02.obj'},
-    {name: 'wheel', path: './models/parts/wheel_03.obj'},
-    {name: 'wheel', path: './models/parts/wheel_04.obj'}
+    {name: 'sensible', path: './models/parts/wheel_01.obj'},
+    {name: 'wheeler', path: './models/parts/wheel_02.obj'},
+    {name: 'vampire', path: './models/parts/wheel_03.obj'},
+    {name: 'disk', path: './models/parts/wheel_04.obj'}
 ]
 var handlebars = [
-    {name: 'handlebar', path: './models/parts/handlebar_02.obj'},
+    {name: 'deep', path: './models/parts/handlebar_02.obj'},
 ]
 
 // globals
@@ -119,7 +129,7 @@ function init() {
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild( renderer.domElement );
 
-    camera.position.set(2,2,2);
+    camera.position.set(1.5,1.5,1.5);
 
     // Floor
     floor = new THREE.Mesh(
@@ -149,9 +159,14 @@ function init() {
 
     // camera controls
     controls = new OrbitControls( camera, renderer.domElement );
+    controls.target.set( 0, 0.2, 0 );
 
     gridXZ = new THREE.GridHelper(100, 10, new THREE.Color(0xff0000), new THREE.Color(0x000000));
-    scene.add(gridXZ);
+    if (helpers) {
+        scene.add(gridXZ);
+    } else {
+        document.getElementById ("toggle").textContent = "Add Helpers";
+    }
 
     generate();
     
@@ -215,6 +230,8 @@ function generate() {
             // scene.add(object);
             updateModel(object);
             console.log(scene);
+
+            updateName();
         }
     }
 
@@ -884,6 +901,27 @@ function possibilities () {
     document.getElementById ("number").textContent = number;
 }
 
+function updateName() {
+    var name =
+        configuration.frame.name + "-" +
+        configuration.fork.name + "-" +
+        configuration.front_wheel.name + "-" +
+        configuration.back_wheel.name + "-" +
+        configuration.handlebar.name;
+    document.getElementById ("name").textContent = name;
+}
+
 document.getElementById ("generate").addEventListener ("click", generate, false);
 document.getElementById ("export").addEventListener ("click", exportBike, false);
 document.getElementById ("toggle").addEventListener ("click", toggleHelpers, false);
+
+window.addEventListener( 'resize', onWindowResize, false );
+
+function onWindowResize(){
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+}

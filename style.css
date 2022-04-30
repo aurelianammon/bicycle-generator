@@ -2,11 +2,13 @@ body { margin: 0; }
 
 #navigation {
     position: absolute;
+    margin: 10px;
 }
 
-button {
-    margin: 10px;
-    position: relative;
+#name {
+    margin-top: 10px;
+    font-size: 36px;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
 /* CSS */
