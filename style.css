@@ -3,6 +3,7 @@ body { margin: 0; }
 #navigation {
     position: absolute;
     margin: 10px;
+    font-size: 0;
 }
 
 #name {
@@ -18,6 +19,13 @@ body { margin: 0; }
     white-space: pre-line;
     font-size: 36px;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+#reader {
+  width: 50vw;
+  position: absolute !important;
+  top: 25vh;
+  margin: auto;
 }
 
 .hidden {
@@ -49,6 +57,7 @@ button {
   vertical-align: middle;
   white-space: nowrap;
   word-wrap: break-word;
+  margin-right: 5px;
 }
 
 button:hover {

@@ -5,6 +5,7 @@
 		<title>My first three.js app</title>
 		<link rel="stylesheet" href="style.css">
 		<link rel="stylesheet" href="reset.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.2.1/html5-qrcode.min.js"></script>
 	</head>
 	<body>
 		<div id="navigation">
@@ -14,8 +15,10 @@
 			<button id="rotate">Stop Rotation</button>
 			<button id="debug">Debug</button>
 			<button id="number" class="black">#</button>
+			<button id="scan">Scan</button>
 			<div id="name"></div>
 		</div>
+		<div id="reader"></div>
 		<div id="position" class="hidden">click to get coordinates</div>
 		<script type="module" src="main.js"></script>
 	</body>

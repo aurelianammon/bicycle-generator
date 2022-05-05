@@ -17,8 +17,6 @@ import { ConditionalLineSegmentsGeometry } from './src/Lines2/ConditionalLineSeg
 import { ConditionalLineMaterial } from './src/Lines2/ConditionalLineMaterial.js';
 import { ColoredShadowMaterial } from './src/ColoredShadowMaterial.js';
 
-import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
-
 // import * as SHADER from './shader.js'; // Or the extension could be just `.js`
 // SHADER.hello('world');
 
@@ -144,14 +142,6 @@ const DARK_SHADOW = 0x2c2e2f;
 init();
 animate();
 
-// createApp({
-//     data() {
-//         return {
-//             message: 'Hello Vue!'
-//         }
-//     }
-// }).mount('#navigation')
-
 function init() {
 
     possibilities();
@@ -225,7 +215,7 @@ function init() {
 
 }
 
-function generate(update = true) {
+function generate(update = true, pre_cof = null) {
 
     if (update) {
         if(debug) {
@@ -233,7 +223,7 @@ function generate(update = true) {
         }
         console.log("generate new model")
         model = {};
-        createConfiguration();
+        createConfiguration(pre_cof);
         loadModels();
     } else {
         console.log("generate old model")
@@ -370,13 +360,24 @@ function randomElement (a) {
     return a[Math.floor((Math.random()*a.length))];
 }
 
-function createConfiguration() {
-    configuration = {
-        frame: randomElement(frames),
-        front_wheel: randomElement(front_wheels),
-        back_wheel: randomElement(back_wheels),
-        handlebar: randomElement(handlebars),
-        fork: randomElement(forks)
+function createConfiguration(pre_conf = null) {
+    if(pre_conf == null) {
+        configuration = {
+            frame: randomElement(frames),
+            front_wheel: randomElement(front_wheels),
+            back_wheel: randomElement(back_wheels),
+            handlebar: randomElement(handlebars),
+            fork: randomElement(forks)
+        }
+    } else {
+        // fix undefined configuration
+        configuration = {
+            frame: frames.find(element => element.name == pre_conf[0]),
+            front_wheel: front_wheels.find(element => element.name == pre_conf[2]),
+            back_wheel: back_wheels.find(element => element.name == pre_conf[3]),
+            handlebar: handlebars.find(element => element.name == pre_conf[4]),
+            fork: forks.find(element => element.name == pre_conf[1])
+        }
     }
 
     console.log(configuration);
@@ -1047,6 +1048,7 @@ document.getElementById ("export").addEventListener ("click", exportBike, false)
 document.getElementById ("toggle").addEventListener ("click", toggleHelpers, false);
 document.getElementById ("rotate").addEventListener ("click", toggleRotate, false);
 document.getElementById ("debug").addEventListener ("click", toggleDebug, false);
+document.getElementById ("scan").addEventListener ("click", scan, false);
 
 window.addEventListener( 'resize', onWindowResize, false );
 
@@ -1112,3 +1114,60 @@ function onMouseMove(event) {
 }
 
 renderer.domElement.addEventListener('mousedown', onMouseMove);
+
+var scaning = false;
+var html5QrCode;
+function scan() {
+    scaning = !scaning;
+    if(!scaning) {
+        document.getElementById("scan").textContent = "Scan";
+        if(html5QrCode) {
+            html5QrCode.stop().then((ignore) => {
+                // QR Code scanning is stopped.
+            }).catch((err) => {
+                // Stop failed, handle it.
+            });
+        }
+
+    } else {
+        document.getElementById("scan").textContent = "No Scan";
+        // This method will trigger user permissions
+        Html5Qrcode.getCameras().then(devices => {
+            /**
+             * devices would be an array of objects of type:
+             * { id: "id", label: "label" }
+             */
+            if (devices && devices.length) {
+            var cameraId = devices[0].id;
+            html5QrCode = new Html5Qrcode(/* element id */ "reader");
+            html5QrCode.start(
+            cameraId, 
+            {
+                fps: 10,    // Optional, frame per seconds for qr code scanning
+                qrbox: { width: 250, height: 250 }  // Optional, if you want bounded box UI
+            },
+            (decodedText, decodedResult) => {
+                // do something when code is read
+                var code = decodedText.split("-");
+                console.log(code);
+                generate(true, code);
+                html5QrCode.stop().then((ignore) => {
+                    // QR Code scanning is stopped.
+                    document.getElementById("scan").textContent = "Scan";
+                    scaning = false;
+                }).catch((err) => {
+                    // Stop failed, handle it.
+                });
+            },
+            (errorMessage) => {
+                // parse error, ignore it.
+            })
+            .catch((err) => {
+            // Start failed, handle it.
+            });
+            }
+        }).catch(err => {
+            // handle err
+        });
+    }
+}
