@@ -17,6 +17,8 @@ import { ConditionalLineSegmentsGeometry } from './src/Lines2/ConditionalLineSeg
 import { ConditionalLineMaterial } from './src/Lines2/ConditionalLineMaterial.js';
 import { ColoredShadowMaterial } from './src/ColoredShadowMaterial.js';
 
+import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js';
+
 // import * as SHADER from './shader.js'; // Or the extension could be just `.js`
 // SHADER.hello('world');
 
@@ -142,6 +144,14 @@ const DARK_SHADOW = 0x2c2e2f;
 init();
 animate();
 
+// createApp({
+//     data() {
+//         return {
+//             message: 'Hello Vue!'
+//         }
+//     }
+// }).mount('#navigation')
+
 function init() {
 
     possibilities();
@@ -253,14 +263,14 @@ function generate(update = true) {
             //normalize the direction vector (convert to vector of length 1)
             dir.normalize();
 
-            const length = 4;
+            const length = 2;
             const hex = 0x00ff00;
             scene.remove( angle_helper );
             scene.remove( handlebar_helper );
             scene.remove( fork_helper );
             angle_helper = new THREE.ArrowHelper( dir, handlebar_point.clone().sub(dir), length, hex );
-            handlebar_helper = new THREE.ArrowHelper( norm, handlebar_point, 1, 0x0000ff );
-            fork_helper = new THREE.ArrowHelper( norm, fork_point, 1, 0x0000ff );
+            handlebar_helper = new THREE.ArrowHelper( norm, handlebar_point, 0.5, 0x0000ff );
+            fork_helper = new THREE.ArrowHelper( norm, fork_point, 0.5, 0x0000ff );
             if (helpers) {
                 scene.add( angle_helper );
                 scene.add( handlebar_helper );
