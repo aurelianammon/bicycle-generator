@@ -11,6 +11,19 @@ body { margin: 0; }
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
+#position {
+    position: absolute;
+    margin: 10px;
+    bottom: 0;
+    white-space: pre-line;
+    font-size: 36px;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.hidden {
+  display: none;
+}
+
 /* CSS */
 button {
   appearance: none;

@@ -17,6 +17,9 @@ import { ConditionalLineSegmentsGeometry } from './src/Lines2/ConditionalLineSeg
 import { ConditionalLineMaterial } from './src/Lines2/ConditionalLineMaterial.js';
 import { ColoredShadowMaterial } from './src/ColoredShadowMaterial.js';
 
+// import * as SHADER from './shader.js'; // Or the extension could be just `.js`
+// SHADER.hello('world');
+
 var scene, renderer, camera;
 var model = {};
 var controls;
@@ -27,30 +30,56 @@ var configuration;
 var edgesModel, originalModel, backgroundModel, conditionalModel, shadowModel, floor, depthModel, gui;
 
 //helpers
-var gridXZ, arrowHelper, arrowHelper_norm
+var gridXZ, angle_helper, handlebar_helper, fork_helper
 
 var angle;
 
-var helpers = false;
-var rotate = true;
+var helpers = true;
+var rotate = false;
+var debug = false;
 
-// AdDD BIKEPARTS HERE IN THE ACCORDING ARRAY
+// ADD BIKEPARTS HERE IN THE ACCORDING ARRAY
 var frames = [
     {name: 'vigorelli', path: './models/parts/frame_01_vigorelli.obj',
-        position: [0, 0.95, 0.65]
+        positions: {
+            handlebar: [0, 0.96, 0.644],
+            fork: [0, 0.666, 0.73], // left, up, front
+            front_wheel: [0.01, 0, 1.01],
+            back_wheel: [0.01, 0, -1.01]
+        }
     },
-    {name: 'super', path: './models/parts/frame_02_super_pista.obj',
-        position: [0, 0.95, 0.64]
-    },
-    {name: 'barcelona', path: './models/parts/frame_03_barcelona.obj',
-        position: [0, 0.90, 0.60]
-    },
-    {name: 'profesional', path: './models/parts/frame_04_barcelona_low_pro.obj',
-        position: [0, 0.90, 0.63]
-    },
-    {name: 'prototype', path: './models/parts/frame_05_barcelona_prototype.obj',
-        position: [0, 0.90, 0.63]
-    },
+    // {name: 'super', path: './models/parts/frame_02_super_pista.obj',
+    //     positions: {
+    //         handlebar: [0, 0.985, 0.615],
+    //         fork: [0, 1, 1],
+    //         front_wheel: [0.01, 0, 1.01],
+    //         back_wheel: [0.01, 0, -1.01]
+    //     }
+    // },
+    // {name: 'barcelona', path: './models/parts/frame_03_barcelona.obj',
+    //     positions: {
+    //         handlebar: [0, 0.95, 0.63],
+    //         fork: [0, 1, 1],
+    //         front_wheel: [0.01, 0, 1.01],
+    //         back_wheel: [0.01, 0, -1.01]
+    //     }
+    // },
+    // {name: 'profesional', path: './models/parts/frame_04_barcelona_low_pro.obj',
+    //     positions: {
+    //         handlebar: [0, 0.90, 0.63],
+    //         fork: [0, 1, 1],
+    //         front_wheel: [0.01, 0, 1.01],
+    //         back_wheel: [0.01, 0, -1.01]
+    //     }
+    // },
+    // {name: 'prototype', path: './models/parts/frame_05_barcelona_prototype.obj',
+    //     positions: {
+    //         handlebar: [0, 0.90, 0.63],
+    //         fork: [0, 1, 1],
+    //         front_wheel: [0.01, 0, 1.01],
+    //         back_wheel: [0.01, 0, -1.01]
+    //     }
+    // },
 ]
 var forks = [
     {name: 'standart', path: './models/parts/fork_01.obj'},
@@ -162,8 +191,13 @@ function init() {
 
     // camera controls
     controls = new OrbitControls( camera, renderer.domElement );
-    controls.target.set( 0, 0.3, 0 );
-    controls.autoRotate = true;
+    controls.target.set( -0.2, 0.3, 0.2 );
+    if (!rotate) {
+        document.getElementById ("rotate").textContent = "Start Rotation";
+        controls.autoRotate = false;
+    } else {
+        controls.autoRotate = true;
+    }
     controls.autoRotateSpeed = 0.5;
 
     gridXZ = new THREE.GridHelper(100, 10, new THREE.Color(0xff0000), new THREE.Color(0x000000));
@@ -179,45 +213,81 @@ function init() {
 
 }
 
-function generate() {
+function generate(update = true) {
 
-    console.log("generate new model")
-    model = {};
-
-    createConfiguration();
-    loadModels();
+    if (update) {
+        if(debug) {
+            toggleDebug();
+        }
+        console.log("generate new model")
+        model = {};
+        createConfiguration();
+        loadModels();
+    } else {
+        console.log("generate old model")
+    }
 
     function waitForModels() {
         if(Object.keys(model).length !== 5) {
             window.setTimeout(waitForModels, 100);
         } else {
-            console.log(model)
-            var pos = configuration.frame.position;
+            console.log(model);
 
-            // add arrowhelpers
-            const dir = new THREE.Vector3( 0, -3, 0.8 );
+            // add angle_helpers
+            const handlebar_point = new THREE.Vector3(
+                configuration.frame.positions.handlebar[0],
+                configuration.frame.positions.handlebar[1],
+                configuration.frame.positions.handlebar[2],
+            );
+            const fork_point = new THREE.Vector3(
+                configuration.frame.positions.fork[0],
+                configuration.frame.positions.fork[1],
+                configuration.frame.positions.fork[2],
+            );
+            // const dir = new THREE.Vector3( 0, -3, 0.8 );
+            const dir = handlebar_point.clone().sub(fork_point);
             const norm = new THREE.Vector3( 1, 0, 0 );
             //normalize the direction vector (convert to vector of length 1)
             dir.normalize();
-            const origin = new THREE.Vector3(pos[0], pos[1], pos[2]);
+
             const length = 4;
             const hex = 0x00ff00;
-            scene.remove( arrowHelper );
-            scene.remove( arrowHelper_norm );
-            arrowHelper = new THREE.ArrowHelper( dir, origin.clone().sub(dir), length, hex );
-            arrowHelper_norm = new THREE.ArrowHelper( norm, origin, 2, 0x0000ff );
+            scene.remove( angle_helper );
+            scene.remove( handlebar_helper );
+            scene.remove( fork_helper );
+            angle_helper = new THREE.ArrowHelper( dir, handlebar_point.clone().sub(dir), length, hex );
+            handlebar_helper = new THREE.ArrowHelper( norm, handlebar_point, 1, 0x0000ff );
+            fork_helper = new THREE.ArrowHelper( norm, fork_point, 1, 0x0000ff );
             if (helpers) {
-                scene.add( arrowHelper );
-                scene.add( arrowHelper_norm );
+                scene.add( angle_helper );
+                scene.add( handlebar_helper );
+                scene.add( fork_helper );
             }
 
-            angle = Math.random() * 2 - 1;
-            model.handlebar.position.set(pos[0], pos[1], pos[2]);
-            model.handlebar.rotateAroundWorldAxis(origin, dir, angle);
-            model.front_wheel.position.set(0, 0, 1.00);
-            model.front_wheel.rotateAroundWorldAxis(origin, dir, angle);
-            model.fork.rotateAroundWorldAxis(origin, dir, angle);
-            model.back_wheel.position.set(0, 0.02, -0.99);
+            if (update) {
+                console.log("hello");
+                angle = Math.random() * 2 - 1;
+                // angle = 0;
+
+                model.handlebar.position.set(
+                    configuration.frame.positions.handlebar[0],
+                    configuration.frame.positions.handlebar[1],
+                    configuration.frame.positions.handlebar[2]
+                );
+                model.handlebar.rotateAroundWorldAxis(handlebar_point, dir, angle);
+                model.front_wheel.position.set(
+                    configuration.frame.positions.front_wheel[0],
+                    configuration.frame.positions.front_wheel[1],
+                    configuration.frame.positions.front_wheel[2]
+                );
+                model.front_wheel.rotateAroundWorldAxis(handlebar_point, dir, angle);
+                model.fork.rotateAroundWorldAxis(handlebar_point, dir, angle);
+                model.back_wheel.position.set(
+                    configuration.frame.positions.back_wheel[0],
+                    configuration.frame.positions.back_wheel[1],
+                    configuration.frame.positions.back_wheel[2]
+                );
+            }
 
             const group = new THREE.Group();
 
@@ -228,8 +298,17 @@ function generate() {
 
             console.log(group)
 
-            var object = mergeObject(group)
-            object.children[0].material = new THREE.MeshStandardMaterial( { color: 0x009900 } );
+            if(debug) {
+                var object = mergeObject(model.frame)
+            } else {
+                if(update) {
+                    var object = mergeObject(group, true);
+                } else {
+                    var object = mergeObject(group, false);
+                }
+            }
+
+            object.children[ 0 ].material = new THREE.MeshStandardMaterial( { color: 0x009900 } );
             object.children[ 0 ].geometry.computeBoundingBox();
 			object.children[ 0 ].castShadow = true;
             // scene.add(object);
@@ -320,12 +399,7 @@ function loadModels() {
 function animate() {
     
     controls.update();
-    requestAnimationFrame( animate );
-
-    if (Object.keys(model).length !== 0 && false) {
-        model.wheel.rotation.x += 0.01;
-        model.wheel.rotation.y += 0.01;
-    }
+    requestAnimationFrame(animate);
 
     let linesColor = LIGHT_LINES;
     let modelColor = LIGHT_MODEL;
@@ -413,6 +487,7 @@ function animate() {
 
     }
 
+    // gives a very sick shading effect if commented out!
     if ( shadowModel ) {
 
         shadowModel.visible = params.lit;
@@ -445,9 +520,11 @@ function animate() {
     renderer.render( scene, camera );
 }
 
-function mergeObject( object ) {
+function mergeObject( object, update = true ) {
 
-    object.updateMatrixWorld( true );
+    if (update) {
+        object.updateMatrixWorld( true );
+    }
 
     const geometry = [];
     object.traverse( c => {
@@ -455,21 +532,20 @@ function mergeObject( object ) {
         if ( c.isMesh ) {
 
             const g = c.geometry;
-            g.applyMatrix4( c.matrixWorld );
-            for ( const key in g.attributes ) {
-
-                if ( key !== 'position' && key !== 'normal' ) {
-
-                    g.deleteAttribute( key );
-
+            if(update){
+                g.applyMatrix4(c.matrixWorld);
+                for (const key in g.attributes) {
+                    if (key !== 'position' && key !== 'normal') {
+                        g.deleteAttribute(key);
+                    }
+                
                 }
-
             }
-            geometry.push( g.toNonIndexed() );
+            // geometry.push(g.toNonIndexed());
+            geometry.push(g);
 
         }
-
-    } );
+    });
 
     const mergedGeometries = BufferGeometryUtils.mergeBufferGeometries( geometry, false );
     const mergedGeometry = BufferGeometryUtils.mergeVertices( mergedGeometries );
@@ -863,8 +939,9 @@ function exportBike(e) {
     // renderer.setPixelRatio( window.devicePixelRatio * 4 );
     var temp_back = scene.background;
     scene.remove(gridXZ);
-    scene.remove( arrowHelper );
-    scene.remove( arrowHelper_norm );
+    scene.remove( angle_helper );
+    scene.remove( handlebar_helper );
+    scene.remove( fork_helper );
     scene.background = null;
     renderer.render( scene, camera );
     var dataUrl = renderer.domElement.toDataURL("image/png");
@@ -877,8 +954,9 @@ function exportBike(e) {
     // renderer.setPixelRatio( window.devicePixelRatio * 2 );
     if (helpers) {
         scene.add(gridXZ)
-        scene.add( arrowHelper );
-        scene.add( arrowHelper_norm );
+        scene.add( angle_helper );
+        scene.add( handlebar_helper );
+        scene.add( fork_helper );
     }
     scene.background = temp_back;
     renderer.render( scene, camera );
@@ -889,14 +967,16 @@ function toggleHelpers (e) {
     if(helpers) {
         e.target.textContent = "Remove Helpers";
         scene.add(gridXZ)
-        scene.add( arrowHelper );
-        scene.add( arrowHelper_norm );
+        scene.add( angle_helper );
+        scene.add( handlebar_helper );
+        scene.add( fork_helper );
         renderer.render( scene, camera );
     } else {
         e.target.textContent = "Add Helpers";
         scene.remove(gridXZ)
-        scene.remove( arrowHelper );
-        scene.remove( arrowHelper_norm );
+        scene.remove( angle_helper );
+        scene.remove( handlebar_helper );
+        scene.remove( fork_helper );
         renderer.render( scene, camera );
     }
 }
@@ -927,10 +1007,26 @@ function toggleRotate (e) {
     }
 }
 
+function toggleDebug(e) {
+    debug = !debug;
+    if (debug) {
+        document.getElementById("debug").textContent = "No Debug";
+        document.getElementById("position").textContent = "click to get coordinates"
+        document.getElementById("position").classList.remove("hidden");
+        generate(false);
+        // document.getElementById ("position").
+    } else {
+        document.getElementById ("debug").textContent = "Debug";
+        document.getElementById("position").classList.add("hidden")
+        generate(false);
+    }
+}
+
 document.getElementById ("generate").addEventListener ("click", generate, false);
 document.getElementById ("export").addEventListener ("click", exportBike, false);
 document.getElementById ("toggle").addEventListener ("click", toggleHelpers, false);
 document.getElementById ("rotate").addEventListener ("click", toggleRotate, false);
+document.getElementById ("debug").addEventListener ("click", toggleDebug, false);
 
 window.addEventListener( 'resize', onWindowResize, false );
 
@@ -942,3 +1038,57 @@ function onWindowResize(){
     renderer.setSize( window.innerWidth, window.innerHeight );
 
 }
+
+// function getCanvasRelativePosition(event) {
+//     const rect = renderer.domElement.getBoundingClientRect();
+//     return {
+//         x: (event.clientX - rect.left) * renderer.domElement.width  / rect.width,
+//         y: (event.clientY - rect.top ) * renderer.domElement.height / rect.height,
+//     };
+// }
+
+// const temp = new THREE.Vector3();
+// function setPosition(event) {
+//     const pos = getCanvasRelativePosition(e);
+//     const x = pos.x / renderer.domElement.width * 2 - 1;
+//     const y = pos.y / renderer.domElement.height * -2 + 1;
+//     temp.set(x, y, 0).unproject(camera);
+//     // state.x = temp.x;
+//     // state.y = temp.y;
+//     console.log(temp);
+// }
+
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+
+function onMouseMove(event) {
+    if(debug) {
+
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // update the picking ray with the camera and mouse position
+    raycaster.setFromCamera(mouse, camera);
+    //   console.log(backgroundModel.children);
+    // calculate objects intersecting the picking ray
+    var intersects = raycaster.intersectObjects(backgroundModel.children);
+    if (intersects.length > 0) {
+        // console.log(backgroundModel);
+        // console.log(intersects[0].point)
+        document.getElementById ("position").textContent = 
+        "x: " + intersects[0].point.x.toFixed(3) + 
+        "\ny: " + intersects[0].point.y.toFixed(3) +
+        "\nz: " + intersects[0].point.z.toFixed(3);
+    }
+
+    // for (var i = 0; i < intersects.length; i++) {
+    //     console.log(intersects[i])
+    // }
+    }
+
+}
+
+renderer.domElement.addEventListener('mousedown', onMouseMove);
