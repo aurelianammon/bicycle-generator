@@ -82,9 +82,10 @@ var frames = [
     // },
 ]
 var forks = [
-    {name: 'standart', path: './models/parts/fork_01.obj'},
-    {name: 'extended', path: './models/parts/fork_02.obj'},
-    {name: 'thin', path: './models/parts/fork_03.obj'},
+    // {name: 'standart', path: './models/parts/fork_01.obj'},
+    // {name: 'extended', path: './models/parts/fork_02.obj'},
+    // {name: 'thin', path: './models/parts/fork_03.obj'},
+    {name: 'standart', path: './models/parts/fork_01_flat.obj'},
 ]
 var front_wheels = [
     {name: 'sensible', path: './models/parts/wheel_01.obj'},
@@ -99,9 +100,10 @@ var back_wheels = [
     {name: 'disk', path: './models/parts/wheel_04.obj'}
 ]
 var handlebars = [
-    {name: 'deep', path: './models/parts/handlebar_01.obj'},
-    {name: 'narrow', path: './models/parts/handlebar_02.obj'},
-    {name: 'wide', path: './models/parts/handlebar_03.obj'},
+    // {name: 'deep', path: './models/parts/handlebar_01.obj'},
+    // {name: 'narrow', path: './models/parts/handlebar_02.obj'},
+    // {name: 'wide', path: './models/parts/handlebar_03.obj'},
+    {name: 'narrow', path: './models/parts/handlebar_02_flat.obj'},
 ]
 
 // globals
@@ -247,6 +249,7 @@ function generate(update = true) {
             // const dir = new THREE.Vector3( 0, -3, 0.8 );
             const dir = handlebar_point.clone().sub(fork_point);
             const norm = new THREE.Vector3( 1, 0, 0 );
+            const tilt = dir.angleTo(new THREE.Vector3(0,1,0))
             //normalize the direction vector (convert to vector of length 1)
             dir.normalize();
 
@@ -274,6 +277,7 @@ function generate(update = true) {
                     configuration.frame.positions.handlebar[1],
                     configuration.frame.positions.handlebar[2]
                 );
+                model.handlebar.rotateAroundWorldAxis(handlebar_point, norm, -tilt);
                 model.handlebar.rotateAroundWorldAxis(handlebar_point, dir, angle);
                 model.front_wheel.position.set(
                     configuration.frame.positions.front_wheel[0],
@@ -281,6 +285,12 @@ function generate(update = true) {
                     configuration.frame.positions.front_wheel[2]
                 );
                 model.front_wheel.rotateAroundWorldAxis(handlebar_point, dir, angle);
+                model.fork.position.set(
+                    configuration.frame.positions.fork[0],
+                    configuration.frame.positions.fork[1],
+                    configuration.frame.positions.fork[2]
+                );
+                model.fork.rotateAroundWorldAxis(fork_point, norm, -tilt);
                 model.fork.rotateAroundWorldAxis(handlebar_point, dir, angle);
                 model.back_wheel.position.set(
                     configuration.frame.positions.back_wheel[0],
