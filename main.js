@@ -253,7 +253,7 @@ function generate(update = true, pre_cof = null) {
             //normalize the direction vector (convert to vector of length 1)
             dir.normalize();
 
-            const length = 2;
+            const length = 1.6;
             const hex = 0x00ff00;
             scene.remove( angle_helper );
             scene.remove( handlebar_helper );
@@ -1015,6 +1015,23 @@ function updateName() {
         configuration.back_wheel.name + "-" +
         configuration.handlebar.name;
     document.getElementById ("name").textContent = name;
+
+    let canvas = document.createElement('canvas');
+    try {
+        console.log(bwipjs);
+        bwipjs.toCanvas(canvas, {
+            bcid:        'azteccode',       // Barcode type
+            text:        name,    // Text to encode
+            scale:       3,               // 3x scaling factor
+            includetext: true,            // Show human-readable text
+            textxalign:  'center',        // Always good to set this
+        });
+        console.log(canvas.toDataURL('image/png'));
+        document.getElementById('code').src = canvas.toDataURL('image/png');
+    } catch (e) {
+        // `e` may be a string or Error object
+        console.log(e);
+    }
 }
 
 function toggleRotate (e) {
