@@ -21,6 +21,7 @@ import { ColoredShadowMaterial } from './src/ColoredShadowMaterial.js';
 // SHADER.hello('world');
 
 var scene, renderer, camera;
+var background_scene = new THREE.Scene();
 var model = {};
 var controls;
 
@@ -156,6 +157,7 @@ function init() {
         alpha: true,
         preserveDrawingBuffer : true // required to support .toDataURL()
     });
+    renderer.autoClear = false;
     renderer.setClearColor( 0x000000, 0 );
     renderer.setPixelRatio( window.devicePixelRatio * 2 );
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -234,6 +236,7 @@ function generate(update = true, pre_cof = null) {
             window.setTimeout(waitForModels, 100);
         } else {
             console.log(model);
+            console.log(full_wheel);
 
             // add angle_helpers
             const handlebar_point = new THREE.Vector3(
@@ -318,6 +321,32 @@ function generate(update = true, pre_cof = null) {
                 }
             }
 
+            // fix background problems
+            while(background_scene.children.length > 0){ 
+                background_scene.remove(background_scene.children[0]); 
+            }
+            const backmodel = new THREE.Group();
+            var front_backmodel = full_wheel.children[0].clone();
+            var back_backmodel = full_wheel.children[0].clone();
+            front_backmodel.position.set(
+                configuration.frame.positions.front_wheel[0],
+                configuration.frame.positions.front_wheel[1],
+                configuration.frame.positions.front_wheel[2]
+            );
+            front_backmodel.rotateAroundWorldAxis(handlebar_point, dir, angle);
+            back_backmodel.position.set(
+                configuration.frame.positions.back_wheel[0],
+                configuration.frame.positions.back_wheel[1],
+                configuration.frame.positions.back_wheel[2]
+            );
+            backmodel.add(back_backmodel)
+            backmodel.add(front_backmodel)
+            console.log(backmodel);
+            var material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF })
+            backmodel.children[0].material = material;
+            backmodel.children[1].material = material;
+            background_scene.add(backmodel);
+
             object.children[ 0 ].material = new THREE.MeshStandardMaterial( { color: 0x009900 } );
             object.children[ 0 ].geometry.computeBoundingBox();
 			object.children[ 0 ].castShadow = true;
@@ -383,11 +412,35 @@ function createConfiguration(pre_conf = null) {
     console.log(configuration);
 }
 
+var full_wheel;
+
 function loadModels() {
 
     // instantiate a loader
     const obj_loader = new OBJLoader();
     // load a resource
+    obj_loader.load(
+        // resource URL
+        './models/parts/wheel_03.obj',
+        // called when resource is loaded
+        function ( object ) {
+            object.traverse( function( child ) {
+                if ( child instanceof THREE.Mesh ) {
+                    child.material = new THREE.MeshStandardMaterial( { color: 0x009900 } );
+                }
+            });
+            full_wheel = object;
+            // scene.add( object );
+        },
+        // called when loading is in progresses
+        function ( xhr ) {
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        },
+        // called when loading has errors
+        function ( error ) {
+            console.log( 'An error happened' );
+        }
+    );
 
     Object.entries(configuration).forEach(entry => {
         const [part, data] = entry;
@@ -533,11 +586,19 @@ function animate() {
 
     }
 
-    scene.background.set( backgroundColor );
+    scene.background = null;
+    background_scene.background = new THREE.Color( 0x0000ff );
     floor.material.color.set( shadowColor );
     floor.material.opacity = params.opacity;
     floor.visible = params.lit;
 
+    render();
+}
+
+function render() {
+    renderer.clear();
+    renderer.render( background_scene, camera );
+    renderer.clearDepth();
     renderer.render( scene, camera );
 }
 
@@ -964,10 +1025,11 @@ function exportBike(e) {
     scene.remove( handlebar_helper );
     scene.remove( fork_helper );
     scene.background = null;
-    renderer.render( scene, camera );
+    // renderer.render( scene, camera );
+    render();
     var dataUrl = renderer.domElement.toDataURL("image/png");
     var link = document.createElement('a');
-    link.download = "my-image.png";
+    link.download = "model_" + name + ".png";
     link.href = dataUrl;
     link.click();
     console.log(dataUrl)
@@ -980,7 +1042,8 @@ function exportBike(e) {
         scene.add( fork_helper );
     }
     scene.background = temp_back;
-    renderer.render( scene, camera );
+    // renderer.render( scene, camera );
+    render();
 }
 
 function toggleHelpers (e) {
@@ -991,14 +1054,14 @@ function toggleHelpers (e) {
         scene.add( angle_helper );
         scene.add( handlebar_helper );
         scene.add( fork_helper );
-        renderer.render( scene, camera );
+        // renderer.render( scene, camera );
     } else {
         e.target.textContent = "Add Helpers";
         scene.remove(gridXZ)
         scene.remove( angle_helper );
         scene.remove( handlebar_helper );
         scene.remove( fork_helper );
-        renderer.render( scene, camera );
+        // renderer.render( scene, camera );
     }
 }
 
@@ -1007,8 +1070,9 @@ function possibilities () {
     document.getElementById ("number").textContent = number;
 }
 
+var name;
 function updateName() {
-    var name =
+    name =
         configuration.frame.name + "-" +
         configuration.fork.name + "-" +
         configuration.front_wheel.name + "-" +
@@ -1018,7 +1082,7 @@ function updateName() {
 
     let canvas = document.createElement('canvas');
     try {
-        console.log(bwipjs);
+        // console.log(bwipjs);
         bwipjs.toCanvas(canvas, {
             bcid:        'azteccode',       // Barcode type
             text:        name,    // Text to encode
