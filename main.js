@@ -17,7 +17,11 @@ import { ConditionalLineSegmentsGeometry } from './src/Lines2/ConditionalLineSeg
 import { ConditionalLineMaterial } from './src/Lines2/ConditionalLineMaterial.js';
 import { ColoredShadowMaterial } from './src/ColoredShadowMaterial.js';
 
+// import * as SHADER from './shader.js'; // Or the extension could be just `.js`
+// SHADER.hello('world');
+
 var scene, renderer, camera;
+var background_scene = new THREE.Scene();
 var model = {};
 var controls;
 
@@ -27,35 +31,62 @@ var configuration;
 var edgesModel, originalModel, backgroundModel, conditionalModel, shadowModel, floor, depthModel, gui;
 
 //helpers
-var gridXZ, arrowHelper, arrowHelper_norm
+var gridXZ, angle_helper, handlebar_helper, fork_helper
 
 var angle;
 
-var helpers = false;
-var rotate = true;
+var helpers = true;
+var rotate = false;
+var debug = false;
 
-// AdDD BIKEPARTS HERE IN THE ACCORDING ARRAY
+// ADD BIKEPARTS HERE IN THE ACCORDING ARRAY
 var frames = [
     {name: 'vigorelli', path: './models/parts/frame_01_vigorelli.obj',
-        position: [0, 0.95, 0.65]
+        positions: {
+            handlebar: [0, 0.96, 0.644],
+            fork: [0, 0.666, 0.73], // left, up, front
+            front_wheel: [0.01, 0, 1.01],
+            back_wheel: [0.01, 0, -1.01]
+        }
     },
-    {name: 'super', path: './models/parts/frame_02_super_pista.obj',
-        position: [0, 0.95, 0.64]
-    },
-    {name: 'barcelona', path: './models/parts/frame_03_barcelona.obj',
-        position: [0, 0.90, 0.60]
-    },
-    {name: 'profesional', path: './models/parts/frame_04_barcelona_low_pro.obj',
-        position: [0, 0.90, 0.63]
-    },
-    {name: 'prototype', path: './models/parts/frame_05_barcelona_prototype.obj',
-        position: [0, 0.90, 0.63]
-    },
+    // {name: 'super', path: './models/parts/frame_02_super_pista.obj',
+    //     positions: {
+    //         handlebar: [0, 0.985, 0.615],
+    //         fork: [0, 1, 1],
+    //         front_wheel: [0.01, 0, 1.01],
+    //         back_wheel: [0.01, 0, -1.01]
+    //     }
+    // },
+    // {name: 'barcelona', path: './models/parts/frame_03_barcelona.obj',
+    //     positions: {
+    //         handlebar: [0, 0.95, 0.63],
+    //         fork: [0, 1, 1],
+    //         front_wheel: [0.01, 0, 1.01],
+    //         back_wheel: [0.01, 0, -1.01]
+    //     }
+    // },
+    // {name: 'profesional', path: './models/parts/frame_04_barcelona_low_pro.obj',
+    //     positions: {
+    //         handlebar: [0, 0.90, 0.63],
+    //         fork: [0, 1, 1],
+    //         front_wheel: [0.01, 0, 1.01],
+    //         back_wheel: [0.01, 0, -1.01]
+    //     }
+    // },
+    // {name: 'prototype', path: './models/parts/frame_05_barcelona_prototype.obj',
+    //     positions: {
+    //         handlebar: [0, 0.90, 0.63],
+    //         fork: [0, 1, 1],
+    //         front_wheel: [0.01, 0, 1.01],
+    //         back_wheel: [0.01, 0, -1.01]
+    //     }
+    // },
 ]
 var forks = [
-    {name: 'standart', path: './models/parts/fork_01.obj'},
-    {name: 'extended', path: './models/parts/fork_02.obj'},
-    {name: 'thin', path: './models/parts/fork_03.obj'},
+    // {name: 'standart', path: './models/parts/fork_01.obj'},
+    // {name: 'extended', path: './models/parts/fork_02.obj'},
+    // {name: 'thin', path: './models/parts/fork_03.obj'},
+    {name: 'standart', path: './models/parts/fork_01_flat.obj'},
 ]
 var front_wheels = [
     {name: 'sensible', path: './models/parts/wheel_01.obj'},
@@ -70,9 +101,10 @@ var back_wheels = [
     {name: 'disk', path: './models/parts/wheel_04.obj'}
 ]
 var handlebars = [
-    {name: 'deep', path: './models/parts/handlebar_01.obj'},
-    {name: 'narrow', path: './models/parts/handlebar_02.obj'},
-    {name: 'wide', path: './models/parts/handlebar_03.obj'},
+    // {name: 'deep', path: './models/parts/handlebar_01.obj'},
+    // {name: 'narrow', path: './models/parts/handlebar_02.obj'},
+    // {name: 'wide', path: './models/parts/handlebar_03.obj'},
+    {name: 'narrow', path: './models/parts/handlebar_02_flat.obj'},
 ]
 
 // globals
@@ -125,6 +157,7 @@ function init() {
         alpha: true,
         preserveDrawingBuffer : true // required to support .toDataURL()
     });
+    renderer.autoClear = false;
     renderer.setClearColor( 0x000000, 0 );
     renderer.setPixelRatio( window.devicePixelRatio * 2 );
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -162,8 +195,13 @@ function init() {
 
     // camera controls
     controls = new OrbitControls( camera, renderer.domElement );
-    controls.target.set( 0, 0.3, 0 );
-    controls.autoRotate = true;
+    controls.target.set( -0.2, 0.3, 0.2 );
+    if (!rotate) {
+        document.getElementById ("rotate").textContent = "Start Rotation";
+        controls.autoRotate = false;
+    } else {
+        controls.autoRotate = true;
+    }
     controls.autoRotateSpeed = 0.5;
 
     gridXZ = new THREE.GridHelper(100, 10, new THREE.Color(0xff0000), new THREE.Color(0x000000));
@@ -179,45 +217,90 @@ function init() {
 
 }
 
-function generate() {
+function generate(update = true, pre_cof = null) {
 
-    console.log("generate new model")
-    model = {};
-
-    createConfiguration();
-    loadModels();
+    if (update) {
+        if(debug) {
+            toggleDebug();
+        }
+        console.log("generate new model")
+        model = {};
+        createConfiguration(pre_cof);
+        loadModels();
+    } else {
+        console.log("generate old model")
+    }
 
     function waitForModels() {
         if(Object.keys(model).length !== 5) {
             window.setTimeout(waitForModels, 100);
         } else {
-            console.log(model)
-            var pos = configuration.frame.position;
+            console.log(model);
+            console.log(full_wheel);
 
-            // add arrowhelpers
-            const dir = new THREE.Vector3( 0, -3, 0.8 );
+            // add angle_helpers
+            const handlebar_point = new THREE.Vector3(
+                configuration.frame.positions.handlebar[0],
+                configuration.frame.positions.handlebar[1],
+                configuration.frame.positions.handlebar[2],
+            );
+            const fork_point = new THREE.Vector3(
+                configuration.frame.positions.fork[0],
+                configuration.frame.positions.fork[1],
+                configuration.frame.positions.fork[2],
+            );
+            // const dir = new THREE.Vector3( 0, -3, 0.8 );
+            const dir = handlebar_point.clone().sub(fork_point);
             const norm = new THREE.Vector3( 1, 0, 0 );
+            const tilt = dir.angleTo(new THREE.Vector3(0,1,0))
             //normalize the direction vector (convert to vector of length 1)
             dir.normalize();
-            const origin = new THREE.Vector3(pos[0], pos[1], pos[2]);
-            const length = 4;
+
+            const length = 1.6;
             const hex = 0x00ff00;
-            scene.remove( arrowHelper );
-            scene.remove( arrowHelper_norm );
-            arrowHelper = new THREE.ArrowHelper( dir, origin.clone().sub(dir), length, hex );
-            arrowHelper_norm = new THREE.ArrowHelper( norm, origin, 2, 0x0000ff );
+            scene.remove( angle_helper );
+            scene.remove( handlebar_helper );
+            scene.remove( fork_helper );
+            angle_helper = new THREE.ArrowHelper( dir, handlebar_point.clone().sub(dir), length, hex );
+            handlebar_helper = new THREE.ArrowHelper( norm, handlebar_point, 0.5, 0x0000ff );
+            fork_helper = new THREE.ArrowHelper( norm, fork_point, 0.5, 0x0000ff );
             if (helpers) {
-                scene.add( arrowHelper );
-                scene.add( arrowHelper_norm );
+                scene.add( angle_helper );
+                scene.add( handlebar_helper );
+                scene.add( fork_helper );
             }
 
-            angle = Math.random() * 2 - 1;
-            model.handlebar.position.set(pos[0], pos[1], pos[2]);
-            model.handlebar.rotateAroundWorldAxis(origin, dir, angle);
-            model.front_wheel.position.set(0, 0, 1.00);
-            model.front_wheel.rotateAroundWorldAxis(origin, dir, angle);
-            model.fork.rotateAroundWorldAxis(origin, dir, angle);
-            model.back_wheel.position.set(0, 0.02, -0.99);
+            if (update) {
+                console.log("hello");
+                angle = Math.random() * 2 - 1;
+                // angle = 0;
+
+                model.handlebar.position.set(
+                    configuration.frame.positions.handlebar[0],
+                    configuration.frame.positions.handlebar[1],
+                    configuration.frame.positions.handlebar[2]
+                );
+                model.handlebar.rotateAroundWorldAxis(handlebar_point, norm, -tilt);
+                model.handlebar.rotateAroundWorldAxis(handlebar_point, dir, angle);
+                model.front_wheel.position.set(
+                    configuration.frame.positions.front_wheel[0],
+                    configuration.frame.positions.front_wheel[1],
+                    configuration.frame.positions.front_wheel[2]
+                );
+                model.front_wheel.rotateAroundWorldAxis(handlebar_point, dir, angle);
+                model.fork.position.set(
+                    configuration.frame.positions.fork[0],
+                    configuration.frame.positions.fork[1],
+                    configuration.frame.positions.fork[2]
+                );
+                model.fork.rotateAroundWorldAxis(fork_point, norm, -tilt);
+                model.fork.rotateAroundWorldAxis(handlebar_point, dir, angle);
+                model.back_wheel.position.set(
+                    configuration.frame.positions.back_wheel[0],
+                    configuration.frame.positions.back_wheel[1],
+                    configuration.frame.positions.back_wheel[2]
+                );
+            }
 
             const group = new THREE.Group();
 
@@ -228,8 +311,43 @@ function generate() {
 
             console.log(group)
 
-            var object = mergeObject(group)
-            object.children[0].material = new THREE.MeshStandardMaterial( { color: 0x009900 } );
+            if(debug) {
+                var object = mergeObject(model.frame)
+            } else {
+                if(update) {
+                    var object = mergeObject(group, true);
+                } else {
+                    var object = mergeObject(group, false);
+                }
+            }
+
+            // fix background problems
+            while(background_scene.children.length > 0){ 
+                background_scene.remove(background_scene.children[0]); 
+            }
+            const backmodel = new THREE.Group();
+            var front_backmodel = full_wheel.children[0].clone();
+            var back_backmodel = full_wheel.children[0].clone();
+            front_backmodel.position.set(
+                configuration.frame.positions.front_wheel[0],
+                configuration.frame.positions.front_wheel[1],
+                configuration.frame.positions.front_wheel[2]
+            );
+            front_backmodel.rotateAroundWorldAxis(handlebar_point, dir, angle);
+            back_backmodel.position.set(
+                configuration.frame.positions.back_wheel[0],
+                configuration.frame.positions.back_wheel[1],
+                configuration.frame.positions.back_wheel[2]
+            );
+            backmodel.add(back_backmodel)
+            backmodel.add(front_backmodel)
+            console.log(backmodel);
+            var material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF })
+            backmodel.children[0].material = material;
+            backmodel.children[1].material = material;
+            background_scene.add(backmodel);
+
+            object.children[ 0 ].material = new THREE.MeshStandardMaterial( { color: 0x009900 } );
             object.children[ 0 ].geometry.computeBoundingBox();
 			object.children[ 0 ].castShadow = true;
             // scene.add(object);
@@ -271,23 +389,58 @@ function randomElement (a) {
     return a[Math.floor((Math.random()*a.length))];
 }
 
-function createConfiguration() {
-    configuration = {
-        frame: randomElement(frames),
-        front_wheel: randomElement(front_wheels),
-        back_wheel: randomElement(back_wheels),
-        handlebar: randomElement(handlebars),
-        fork: randomElement(forks)
+function createConfiguration(pre_conf = null) {
+    if(pre_conf == null) {
+        configuration = {
+            frame: randomElement(frames),
+            front_wheel: randomElement(front_wheels),
+            back_wheel: randomElement(back_wheels),
+            handlebar: randomElement(handlebars),
+            fork: randomElement(forks)
+        }
+    } else {
+        // fix undefined configuration
+        configuration = {
+            frame: frames.find(element => element.name == pre_conf[0]),
+            front_wheel: front_wheels.find(element => element.name == pre_conf[2]),
+            back_wheel: back_wheels.find(element => element.name == pre_conf[3]),
+            handlebar: handlebars.find(element => element.name == pre_conf[4]),
+            fork: forks.find(element => element.name == pre_conf[1])
+        }
     }
 
     console.log(configuration);
 }
+
+var full_wheel;
 
 function loadModels() {
 
     // instantiate a loader
     const obj_loader = new OBJLoader();
     // load a resource
+    obj_loader.load(
+        // resource URL
+        './models/parts/wheel_03.obj',
+        // called when resource is loaded
+        function ( object ) {
+            object.traverse( function( child ) {
+                if ( child instanceof THREE.Mesh ) {
+                    child.material = new THREE.MeshStandardMaterial( { color: 0x009900 } );
+                }
+            });
+            full_wheel = object;
+            // scene.add( object );
+        },
+        // called when loading is in progresses
+        function ( xhr ) {
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        },
+        // called when loading has errors
+        function ( error ) {
+            console.log( 'An error happened' );
+        }
+    );
 
     Object.entries(configuration).forEach(entry => {
         const [part, data] = entry;
@@ -320,12 +473,7 @@ function loadModels() {
 function animate() {
     
     controls.update();
-    requestAnimationFrame( animate );
-
-    if (Object.keys(model).length !== 0 && false) {
-        model.wheel.rotation.x += 0.01;
-        model.wheel.rotation.y += 0.01;
-    }
+    requestAnimationFrame(animate);
 
     let linesColor = LIGHT_LINES;
     let modelColor = LIGHT_MODEL;
@@ -413,6 +561,7 @@ function animate() {
 
     }
 
+    // gives a very sick shading effect if commented out!
     if ( shadowModel ) {
 
         shadowModel.visible = params.lit;
@@ -437,17 +586,27 @@ function animate() {
 
     }
 
-    scene.background.set( backgroundColor );
+    scene.background = null;
+    background_scene.background = new THREE.Color( 0x0000ff );
     floor.material.color.set( shadowColor );
     floor.material.opacity = params.opacity;
     floor.visible = params.lit;
 
+    render();
+}
+
+function render() {
+    renderer.clear();
+    renderer.render( background_scene, camera );
+    renderer.clearDepth();
     renderer.render( scene, camera );
 }
 
-function mergeObject( object ) {
+function mergeObject( object, update = true ) {
 
-    object.updateMatrixWorld( true );
+    if (update) {
+        object.updateMatrixWorld( true );
+    }
 
     const geometry = [];
     object.traverse( c => {
@@ -455,21 +614,20 @@ function mergeObject( object ) {
         if ( c.isMesh ) {
 
             const g = c.geometry;
-            g.applyMatrix4( c.matrixWorld );
-            for ( const key in g.attributes ) {
-
-                if ( key !== 'position' && key !== 'normal' ) {
-
-                    g.deleteAttribute( key );
-
+            if(update){
+                g.applyMatrix4(c.matrixWorld);
+                for (const key in g.attributes) {
+                    if (key !== 'position' && key !== 'normal') {
+                        g.deleteAttribute(key);
+                    }
+                
                 }
-
             }
-            geometry.push( g.toNonIndexed() );
+            // geometry.push(g.toNonIndexed());
+            geometry.push(g);
 
         }
-
-    } );
+    });
 
     const mergedGeometries = BufferGeometryUtils.mergeBufferGeometries( geometry, false );
     const mergedGeometry = BufferGeometryUtils.mergeVertices( mergedGeometries );
@@ -863,13 +1021,15 @@ function exportBike(e) {
     // renderer.setPixelRatio( window.devicePixelRatio * 4 );
     var temp_back = scene.background;
     scene.remove(gridXZ);
-    scene.remove( arrowHelper );
-    scene.remove( arrowHelper_norm );
+    scene.remove( angle_helper );
+    scene.remove( handlebar_helper );
+    scene.remove( fork_helper );
     scene.background = null;
-    renderer.render( scene, camera );
+    // renderer.render( scene, camera );
+    render();
     var dataUrl = renderer.domElement.toDataURL("image/png");
     var link = document.createElement('a');
-    link.download = "my-image.png";
+    link.download = "model_" + name + ".png";
     link.href = dataUrl;
     link.click();
     console.log(dataUrl)
@@ -877,11 +1037,13 @@ function exportBike(e) {
     // renderer.setPixelRatio( window.devicePixelRatio * 2 );
     if (helpers) {
         scene.add(gridXZ)
-        scene.add( arrowHelper );
-        scene.add( arrowHelper_norm );
+        scene.add( angle_helper );
+        scene.add( handlebar_helper );
+        scene.add( fork_helper );
     }
     scene.background = temp_back;
-    renderer.render( scene, camera );
+    // renderer.render( scene, camera );
+    render();
 }
 
 function toggleHelpers (e) {
@@ -889,15 +1051,17 @@ function toggleHelpers (e) {
     if(helpers) {
         e.target.textContent = "Remove Helpers";
         scene.add(gridXZ)
-        scene.add( arrowHelper );
-        scene.add( arrowHelper_norm );
-        renderer.render( scene, camera );
+        scene.add( angle_helper );
+        scene.add( handlebar_helper );
+        scene.add( fork_helper );
+        // renderer.render( scene, camera );
     } else {
         e.target.textContent = "Add Helpers";
         scene.remove(gridXZ)
-        scene.remove( arrowHelper );
-        scene.remove( arrowHelper_norm );
-        renderer.render( scene, camera );
+        scene.remove( angle_helper );
+        scene.remove( handlebar_helper );
+        scene.remove( fork_helper );
+        // renderer.render( scene, camera );
     }
 }
 
@@ -906,14 +1070,32 @@ function possibilities () {
     document.getElementById ("number").textContent = number;
 }
 
+var name;
 function updateName() {
-    var name =
+    name =
         configuration.frame.name + "-" +
         configuration.fork.name + "-" +
         configuration.front_wheel.name + "-" +
         configuration.back_wheel.name + "-" +
         configuration.handlebar.name;
     document.getElementById ("name").textContent = name;
+
+    let canvas = document.createElement('canvas');
+    try {
+        // console.log(bwipjs);
+        bwipjs.toCanvas(canvas, {
+            bcid:        'azteccode',       // Barcode type
+            text:        name,    // Text to encode
+            scale:       3,               // 3x scaling factor
+            includetext: true,            // Show human-readable text
+            textxalign:  'center',        // Always good to set this
+        });
+        console.log(canvas.toDataURL('image/png'));
+        document.getElementById('code').src = canvas.toDataURL('image/png');
+    } catch (e) {
+        // `e` may be a string or Error object
+        console.log(e);
+    }
 }
 
 function toggleRotate (e) {
@@ -927,10 +1109,27 @@ function toggleRotate (e) {
     }
 }
 
+function toggleDebug(e) {
+    debug = !debug;
+    if (debug) {
+        document.getElementById("debug").textContent = "No Debug";
+        document.getElementById("position").textContent = "click to get coordinates"
+        document.getElementById("position").classList.remove("hidden");
+        generate(false);
+        // document.getElementById ("position").
+    } else {
+        document.getElementById ("debug").textContent = "Debug";
+        document.getElementById("position").classList.add("hidden")
+        generate(false);
+    }
+}
+
 document.getElementById ("generate").addEventListener ("click", generate, false);
 document.getElementById ("export").addEventListener ("click", exportBike, false);
 document.getElementById ("toggle").addEventListener ("click", toggleHelpers, false);
 document.getElementById ("rotate").addEventListener ("click", toggleRotate, false);
+document.getElementById ("debug").addEventListener ("click", toggleDebug, false);
+document.getElementById ("scan").addEventListener ("click", scan, false);
 
 window.addEventListener( 'resize', onWindowResize, false );
 
@@ -941,4 +1140,115 @@ function onWindowResize(){
 
     renderer.setSize( window.innerWidth, window.innerHeight );
 
+}
+
+// function getCanvasRelativePosition(event) {
+//     const rect = renderer.domElement.getBoundingClientRect();
+//     return {
+//         x: (event.clientX - rect.left) * renderer.domElement.width  / rect.width,
+//         y: (event.clientY - rect.top ) * renderer.domElement.height / rect.height,
+//     };
+// }
+
+// const temp = new THREE.Vector3();
+// function setPosition(event) {
+//     const pos = getCanvasRelativePosition(e);
+//     const x = pos.x / renderer.domElement.width * 2 - 1;
+//     const y = pos.y / renderer.domElement.height * -2 + 1;
+//     temp.set(x, y, 0).unproject(camera);
+//     // state.x = temp.x;
+//     // state.y = temp.y;
+//     console.log(temp);
+// }
+
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+
+function onMouseMove(event) {
+    if(debug) {
+
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // update the picking ray with the camera and mouse position
+    raycaster.setFromCamera(mouse, camera);
+    //   console.log(backgroundModel.children);
+    // calculate objects intersecting the picking ray
+    var intersects = raycaster.intersectObjects(backgroundModel.children);
+    if (intersects.length > 0) {
+        // console.log(backgroundModel);
+        // console.log(intersects[0].point)
+        document.getElementById ("position").textContent = 
+        "x: " + intersects[0].point.x.toFixed(3) + 
+        "\ny: " + intersects[0].point.y.toFixed(3) +
+        "\nz: " + intersects[0].point.z.toFixed(3);
+    }
+
+    // for (var i = 0; i < intersects.length; i++) {
+    //     console.log(intersects[i])
+    // }
+    }
+
+}
+
+renderer.domElement.addEventListener('mousedown', onMouseMove);
+
+var scaning = false;
+var html5QrCode;
+function scan() {
+    scaning = !scaning;
+    if(!scaning) {
+        document.getElementById("scan").textContent = "Scan";
+        if(html5QrCode) {
+            html5QrCode.stop().then((ignore) => {
+                // QR Code scanning is stopped.
+            }).catch((err) => {
+                // Stop failed, handle it.
+            });
+        }
+
+    } else {
+        document.getElementById("scan").textContent = "No Scan";
+        // This method will trigger user permissions
+        Html5Qrcode.getCameras().then(devices => {
+            /**
+             * devices would be an array of objects of type:
+             * { id: "id", label: "label" }
+             */
+            if (devices && devices.length) {
+            var cameraId = devices[0].id;
+            html5QrCode = new Html5Qrcode(/* element id */ "reader");
+            html5QrCode.start(
+            cameraId, 
+            {
+                fps: 10,    // Optional, frame per seconds for qr code scanning
+                qrbox: { width: 250, height: 250 }  // Optional, if you want bounded box UI
+            },
+            (decodedText, decodedResult) => {
+                // do something when code is read
+                var code = decodedText.split("-");
+                console.log(code);
+                generate(true, code);
+                html5QrCode.stop().then((ignore) => {
+                    // QR Code scanning is stopped.
+                    document.getElementById("scan").textContent = "Scan";
+                    scaning = false;
+                }).catch((err) => {
+                    // Stop failed, handle it.
+                });
+            },
+            (errorMessage) => {
+                // parse error, ignore it.
+            })
+            .catch((err) => {
+            // Start failed, handle it.
+            });
+            }
+        }).catch(err => {
+            // handle err
+        });
+    }
 }
