@@ -33,7 +33,7 @@ var edgesModel, originalModel, backgroundModel, conditionalModel, shadowModel, f
 //helpers
 var gridXZ, angle_helper, handlebar_helper, fork_helper
 
-var angle;
+var angle, wheel_scale
 
 var helpers = true;
 var rotate = false;
@@ -45,67 +45,54 @@ var frames = [
         positions: {
             handlebar: [0, 0.96, 0.644],
             fork: [0, 0.666, 0.73], // left, up, front
-            front_wheel: [0.01, 0, 1.01],
             back_wheel: [0.01, 0, -1.01]
         }
     },
     {name: 'super', path: './models/parts/frame_02_super_pista.obj',
         positions: {
-            handlebar: [0, 0.985, 0.615],
-            fork: [0, 0.666, 0.73], // left, up, front
-            front_wheel: [0.01, 0, 1.01],
-            back_wheel: [0.01, 0, -1.01]
+            handlebar: [0, 0.99, 0.629],
+            fork: [0, 0.651, 0.735], // left, up, front
+            back_wheel: [-0.01, 0, -1.01]
         }
     },
     {name: 'barcelona', path: './models/parts/frame_03_barcelona.obj',
         positions: {
-            handlebar: [0, 0.95, 0.63],
-            fork: [0, 0.666, 0.73], // left, up, front
-            front_wheel: [0.01, 0, 1.01],
+            handlebar: [0, 0.988, 0.643],
+            fork: [0, 0.651, 0.753], // left, up, front
             back_wheel: [0.01, 0, -1.01]
         }
     },
     {name: 'profesional', path: './models/parts/frame_04_barcelona_low_pro.obj',
         positions: {
-            handlebar: [0, 0.90, 0.63],
-            fork: [0, 0.666, 0.73], // left, up, front
-            front_wheel: [0.01, 0, 1.01],
+            handlebar: [0, 0.912, 0.645],
+            fork: [0, 0.67, 0.728], // left, up, front
             back_wheel: [0.01, 0, -1.01]
         }
     },
     {name: 'prototype', path: './models/parts/frame_05_barcelona_prototype.obj',
         positions: {
-            handlebar: [0, 0.90, 0.63],
-            fork: [0, 0.666, 0.73], // left, up, front
-            front_wheel: [0.01, 0, 1.01],
+            handlebar: [0, 0.912, 0.646],
+            fork: [0, 0.67, 0.727], // left, up, front
             back_wheel: [0.01, 0, -1.01]
         }
     },
 ]
 var forks = [
-    {name: 'standart', path: './models/parts/fork_01.obj'},
-    {name: 'extended', path: './models/parts/fork_02.obj'},
-    {name: 'thin', path: './models/parts/fork_03.obj'},
-    // {name: 'standart', path: './models/parts/fork_01_flat.obj'},
+    // {name: 'standart', path: './models/parts/fork_01.obj'},
+    // {name: 'extended', path: './models/parts/fork_02.obj'},
+    {name: 'thin', path: './models/parts/fork_03.obj', vector: [0.005, -0.75, 0.065]},
+    {name: 'longboy', path: './models/parts/fork_04.obj', vector: [0.005, -0.74, 0.17]},
 ]
-var front_wheels = [
-    {name: 'sensible', path: './models/parts/wheel_01.obj', size: 0.6},
-    {name: 'wheeler', path: './models/parts/wheel_02.obj', size: 0.6},
-    {name: 'vampire', path: './models/parts/wheel_03.obj', size: 0.6},
-    {name: 'disk', path: './models/parts/wheel_04.obj', size: 0.6}
-]
-var back_wheels = [
-    {name: 'sensible', path: './models/parts/wheel_01.obj', size: 0.6},
-    {name: 'wheeler', path: './models/parts/wheel_02.obj', size: 0.6},
-    {name: 'vampire', path: './models/parts/wheel_03.obj', size: 0.6},
-    {name: 'disk', path: './models/parts/wheel_04.obj', size: 0.6}
+var wheels = [
+    {name: 'sensible', path: './models/parts/wheel_01.obj'},
+    {name: 'wheeler', path: './models/parts/wheel_02.obj'},
+    {name: 'vampire', path: './models/parts/wheel_03.obj'},
+    {name: 'disk', path: './models/parts/wheel_04.obj'}
 ]
 var handlebars = [
     {name: 'deep', path: './models/parts/handlebar_01.obj'},
     {name: 'narrow', path: './models/parts/handlebar_02.obj'},
     {name: 'wide', path: './models/parts/handlebar_03.obj'},
-    {name: 'wide', path: './models/parts/handlebar_04_tape_test.obj'}
-    // {name: 'narrow', path: './models/parts/handlebar_02_flat.obj'},
 ]
 
 // globals
@@ -271,10 +258,19 @@ function generate(update = true, pre_cof = null) {
                 scene.add( fork_helper );
             }
 
+            var front_wheel_position = new THREE.Vector3(
+                configuration.fork.vector[0],
+                configuration.fork.vector[1],
+                configuration.fork.vector[2] 
+            );
+            front_wheel_position.applyAxisAngle( norm, -tilt );
+            front_wheel_position = fork_point.clone().add(front_wheel_position);
+
             if (update) {
                 console.log("hello");
                 angle = Math.random() * 2 - 1;
                 // angle = 0;
+                wheel_scale = [1, 1];
 
                 model.handlebar.position.set(
                     configuration.frame.positions.handlebar[0],
@@ -283,10 +279,16 @@ function generate(update = true, pre_cof = null) {
                 );
                 model.handlebar.rotateAroundWorldAxis(handlebar_point, norm, -tilt);
                 model.handlebar.rotateAroundWorldAxis(handlebar_point, dir, angle);
+                model.front_wheel.scale.set(1, wheel_scale[0], wheel_scale[0]);
+                // model.front_wheel.position.set(
+                //     configuration.frame.positions.front_wheel[0],
+                //     configuration.frame.positions.front_wheel[1],
+                //     configuration.frame.positions.front_wheel[2]
+                // );
                 model.front_wheel.position.set(
-                    configuration.frame.positions.front_wheel[0],
-                    configuration.frame.positions.front_wheel[1],
-                    configuration.frame.positions.front_wheel[2]
+                    front_wheel_position.x,
+                    front_wheel_position.y,
+                    front_wheel_position.z
                 );
                 model.front_wheel.rotateAroundWorldAxis(handlebar_point, dir, angle);
                 model.fork.position.set(
@@ -296,6 +298,7 @@ function generate(update = true, pre_cof = null) {
                 );
                 model.fork.rotateAroundWorldAxis(fork_point, norm, -tilt);
                 model.fork.rotateAroundWorldAxis(handlebar_point, dir, angle);
+                model.back_wheel.scale.set(1, wheel_scale[1], wheel_scale[1]);
                 model.back_wheel.position.set(
                     configuration.frame.positions.back_wheel[0],
                     configuration.frame.positions.back_wheel[1],
@@ -329,27 +332,27 @@ function generate(update = true, pre_cof = null) {
             const backmodel = new THREE.Group();
             // var front_backmodel = full_wheel.children[0].clone();
             // var back_backmodel = full_wheel.children[0].clone();
-            const geometry = new THREE.CylinderGeometry( 1, 1, 0.05, 32 );
+            const geometry = new THREE.CylinderGeometry( 0.6, 0.6, 0.01, 32 );
             const material = new THREE.MeshBasicMaterial( {color: 0x000000} );
             const cylinder = new THREE.Mesh( geometry, material );
             cylinder.rotation.z = Math.PI / 2;
             var front_backmodel = cylinder.clone();
             front_backmodel.scale.set(
-                configuration.front_wheel.size,
-                0,
-                configuration.front_wheel.size
+                wheel_scale[0],
+                1,
+                wheel_scale[0]
             );
             front_backmodel.position.set(
-                configuration.frame.positions.front_wheel[0],
-                configuration.frame.positions.front_wheel[1],
-                configuration.frame.positions.front_wheel[2]
+                front_wheel_position.x,
+                front_wheel_position.y,
+                front_wheel_position.z
             );
             front_backmodel.rotateAroundWorldAxis(handlebar_point, dir, angle);
             var back_backmodel = cylinder.clone();
             back_backmodel.scale.set(
-                configuration.back_wheel.size,
-                0,
-                configuration.back_wheel.size
+                wheel_scale[1],
+                1,
+                wheel_scale[1]
             );
             back_backmodel.position.set(
                 configuration.frame.positions.back_wheel[0],
@@ -406,8 +409,8 @@ function createConfiguration(pre_conf = null) {
     if(pre_conf == null) {
         configuration = {
             frame: randomElement(frames),
-            front_wheel: randomElement(front_wheels),
-            back_wheel: randomElement(back_wheels),
+            front_wheel: randomElement(wheels),
+            back_wheel: randomElement(wheels),
             handlebar: randomElement(handlebars),
             fork: randomElement(forks)
         }
@@ -415,8 +418,8 @@ function createConfiguration(pre_conf = null) {
         // fix undefined configuration
         configuration = {
             frame: frames.find(element => element.name == pre_conf[0]),
-            front_wheel: front_wheels.find(element => element.name == pre_conf[2]),
-            back_wheel: back_wheels.find(element => element.name == pre_conf[3]),
+            front_wheel: wheels.find(element => element.name == pre_conf[2]),
+            back_wheel: wheels.find(element => element.name == pre_conf[3]),
             handlebar: handlebars.find(element => element.name == pre_conf[4]),
             fork: forks.find(element => element.name == pre_conf[1])
         }
@@ -1032,12 +1035,12 @@ function exportBike(e) {
 
     // no background
     // renderer.setPixelRatio( window.devicePixelRatio * 4 );
-    var temp_back = scene.background;
+    var temp_back = background_scene.background;
     scene.remove(gridXZ);
     scene.remove( angle_helper );
     scene.remove( handlebar_helper );
     scene.remove( fork_helper );
-    scene.background = null;
+    background_scene.background = null;
     // renderer.render( scene, camera );
     render();
     var dataUrl = renderer.domElement.toDataURL("image/png");
@@ -1054,7 +1057,7 @@ function exportBike(e) {
         scene.add( handlebar_helper );
         scene.add( fork_helper );
     }
-    scene.background = temp_back;
+    background_scene.background = temp_back;
     // renderer.render( scene, camera );
     render();
 }
@@ -1079,7 +1082,7 @@ function toggleHelpers (e) {
 }
 
 function possibilities () {
-    var number = frames.length * back_wheels.length * front_wheels.length * handlebars.length * forks.length;
+    var number = frames.length * wheels.length * wheels.length * handlebars.length * forks.length;
     document.getElementById ("number").textContent = number;
 }
 
