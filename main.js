@@ -104,6 +104,7 @@ var handlebars = [
     {name: 'deep', path: './models/parts/handlebar_01.obj'},
     {name: 'narrow', path: './models/parts/handlebar_02.obj'},
     {name: 'wide', path: './models/parts/handlebar_03.obj'},
+    {name: 'wide', path: './models/parts/handlebar_04_tape_test.obj'}
     // {name: 'narrow', path: './models/parts/handlebar_02_flat.obj'},
 ]
 
