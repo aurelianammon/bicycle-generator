@@ -52,9 +52,9 @@ var frames = [
     // {name: 'super', path: './models/parts/frame_02_super_pista.obj',
     //     positions: {
     //         handlebar: [0, 0.985, 0.615],
-    //         fork: [0, 1, 1],
-    //         front_wheel: [0.01, 0, 1.01],
-    //         back_wheel: [0.01, 0, -1.01]
+    //         fork: [0.01, 0.666, 0.73],
+    //         front_wheel: [0.01, 0.009, 1.01],
+    //         back_wheel: [0, 0, -1.01]
     //     }
     // },
     // {name: 'barcelona', path: './models/parts/frame_03_barcelona.obj',
