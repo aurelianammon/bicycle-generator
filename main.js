@@ -49,62 +49,63 @@ var frames = [
             back_wheel: [0.01, 0, -1.01]
         }
     },
-    // {name: 'super', path: './models/parts/frame_02_super_pista.obj',
-    //     positions: {
-    //         handlebar: [0, 0.985, 0.615],
-    //         fork: [0.01, 0.666, 0.73],
-    //         front_wheel: [0.01, 0.009, 1.01],
-    //         back_wheel: [0, 0, -1.01]
-    //     }
-    // },
-    // {name: 'barcelona', path: './models/parts/frame_03_barcelona.obj',
-    //     positions: {
-    //         handlebar: [0, 0.95, 0.63],
-    //         fork: [0, 1, 1],
-    //         front_wheel: [0.01, 0, 1.01],
-    //         back_wheel: [0.01, 0, -1.01]
-    //     }
-    // },
-    // {name: 'profesional', path: './models/parts/frame_04_barcelona_low_pro.obj',
-    //     positions: {
-    //         handlebar: [0, 0.90, 0.63],
-    //         fork: [0, 1, 1],
-    //         front_wheel: [0.01, 0, 1.01],
-    //         back_wheel: [0.01, 0, -1.01]
-    //     }
-    // },
-    // {name: 'prototype', path: './models/parts/frame_05_barcelona_prototype.obj',
-    //     positions: {
-    //         handlebar: [0, 0.90, 0.63],
-    //         fork: [0, 1, 1],
-    //         front_wheel: [0.01, 0, 1.01],
-    //         back_wheel: [0.01, 0, -1.01]
-    //     }
-    // },
+    {name: 'super', path: './models/parts/frame_02_super_pista.obj',
+        positions: {
+            handlebar: [0, 0.985, 0.615],
+            fork: [0, 0.666, 0.73], // left, up, front
+            front_wheel: [0.01, 0, 1.01],
+            back_wheel: [0.01, 0, -1.01]
+        }
+    },
+    {name: 'barcelona', path: './models/parts/frame_03_barcelona.obj',
+        positions: {
+            handlebar: [0, 0.95, 0.63],
+            fork: [0, 0.666, 0.73], // left, up, front
+            front_wheel: [0.01, 0, 1.01],
+            back_wheel: [0.01, 0, -1.01]
+        }
+    },
+    {name: 'profesional', path: './models/parts/frame_04_barcelona_low_pro.obj',
+        positions: {
+            handlebar: [0, 0.90, 0.63],
+            fork: [0, 0.666, 0.73], // left, up, front
+            front_wheel: [0.01, 0, 1.01],
+            back_wheel: [0.01, 0, -1.01]
+        }
+    },
+    {name: 'prototype', path: './models/parts/frame_05_barcelona_prototype.obj',
+        positions: {
+            handlebar: [0, 0.90, 0.63],
+            fork: [0, 0.666, 0.73], // left, up, front
+            front_wheel: [0.01, 0, 1.01],
+            back_wheel: [0.01, 0, -1.01]
+        }
+    },
 ]
 var forks = [
-    // {name: 'standart', path: './models/parts/fork_01.obj'},
-    // {name: 'extended', path: './models/parts/fork_02.obj'},
-    // {name: 'thin', path: './models/parts/fork_03.obj'},
-    {name: 'standart', path: './models/parts/fork_01_flat.obj'},
+    {name: 'standart', path: './models/parts/fork_01.obj'},
+    {name: 'extended', path: './models/parts/fork_02.obj'},
+    {name: 'thin', path: './models/parts/fork_03.obj'},
+    // {name: 'standart', path: './models/parts/fork_01_flat.obj'},
 ]
 var front_wheels = [
-    {name: 'sensible', path: './models/parts/wheel_01.obj'},
-    {name: 'wheeler', path: './models/parts/wheel_02.obj'},
-    {name: 'vampire', path: './models/parts/wheel_03.obj'},
-    {name: 'disk', path: './models/parts/wheel_04.obj'}
+    {name: 'sensible', path: './models/parts/wheel_01.obj', size: 0.6},
+    {name: 'wheeler', path: './models/parts/wheel_02.obj', size: 0.6},
+    {name: 'vampire', path: './models/parts/wheel_03.obj', size: 0.6},
+    {name: 'disk', path: './models/parts/wheel_04.obj', size: 0.6}
 ]
 var back_wheels = [
-    {name: 'sensible', path: './models/parts/wheel_01.obj'},
-    {name: 'wheeler', path: './models/parts/wheel_02.obj'},
-    {name: 'vampire', path: './models/parts/wheel_03.obj'},
-    {name: 'disk', path: './models/parts/wheel_04.obj'}
+    {name: 'sensible', path: './models/parts/wheel_01.obj', size: 0.6},
+    {name: 'wheeler', path: './models/parts/wheel_02.obj', size: 0.6},
+    {name: 'vampire', path: './models/parts/wheel_03.obj', size: 0.6},
+    {name: 'disk', path: './models/parts/wheel_04.obj', size: 0.6}
 ]
 var handlebars = [
-    // {name: 'deep', path: './models/parts/handlebar_01.obj'},
-    // {name: 'narrow', path: './models/parts/handlebar_02.obj'},
-    // {name: 'wide', path: './models/parts/handlebar_03.obj'},
-    {name: 'narrow', path: './models/parts/handlebar_02_flat.obj'},
+    {name: 'deep', path: './models/parts/handlebar_01.obj'},
+    {name: 'narrow', path: './models/parts/handlebar_02.obj'},
+    {name: 'wide', path: './models/parts/handlebar_03.obj'},
+    {name: 'wide', path: './models/parts/handlebar_04_tape_test.obj'}
+    // {name: 'narrow', path: './models/parts/handlebar_02_flat.obj'},
 ]
 
 // globals
@@ -326,14 +327,30 @@ function generate(update = true, pre_cof = null) {
                 background_scene.remove(background_scene.children[0]); 
             }
             const backmodel = new THREE.Group();
-            var front_backmodel = full_wheel.children[0].clone();
-            var back_backmodel = full_wheel.children[0].clone();
+            // var front_backmodel = full_wheel.children[0].clone();
+            // var back_backmodel = full_wheel.children[0].clone();
+            const geometry = new THREE.CylinderGeometry( 1, 1, 0.05, 32 );
+            const material = new THREE.MeshBasicMaterial( {color: 0x000000} );
+            const cylinder = new THREE.Mesh( geometry, material );
+            cylinder.rotation.z = Math.PI / 2;
+            var front_backmodel = cylinder.clone();
+            front_backmodel.scale.set(
+                configuration.front_wheel.size,
+                0,
+                configuration.front_wheel.size
+            );
             front_backmodel.position.set(
                 configuration.frame.positions.front_wheel[0],
                 configuration.frame.positions.front_wheel[1],
                 configuration.frame.positions.front_wheel[2]
             );
             front_backmodel.rotateAroundWorldAxis(handlebar_point, dir, angle);
+            var back_backmodel = cylinder.clone();
+            back_backmodel.scale.set(
+                configuration.back_wheel.size,
+                0,
+                configuration.back_wheel.size
+            );
             back_backmodel.position.set(
                 configuration.frame.positions.back_wheel[0],
                 configuration.frame.positions.back_wheel[1],
@@ -341,10 +358,6 @@ function generate(update = true, pre_cof = null) {
             );
             backmodel.add(back_backmodel)
             backmodel.add(front_backmodel)
-            console.log(backmodel);
-            var material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF })
-            backmodel.children[0].material = material;
-            backmodel.children[1].material = material;
             background_scene.add(backmodel);
 
             object.children[ 0 ].material = new THREE.MeshStandardMaterial( { color: 0x009900 } );
@@ -587,7 +600,7 @@ function animate() {
     }
 
     scene.background = null;
-    background_scene.background = new THREE.Color( 0x0000ff );
+    background_scene.background = new THREE.Color( 0xffffff );
     floor.material.color.set( shadowColor );
     floor.material.opacity = params.opacity;
     floor.visible = params.lit;
