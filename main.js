@@ -78,10 +78,10 @@ var frames = [
     },
 ]
 var forks = [
-    // {name: 'standart', path: './models/parts/fork_01.obj'},
-    // {name: 'extended', path: './models/parts/fork_02.obj'},
+    {name: 'standart', path: './models/parts/fork_01.obj',vector: [0.005, -0.75, 0.065]},
+    {name: 'extended', path: './models/parts/fork_02.obj',vector: [0.005, -0.75, 0.065]},
     {name: 'thin', path: './models/parts/fork_03.obj', vector: [0.005, -0.75, 0.065]},
-    {name: 'longboy', path: './models/parts/fork_04.obj', vector: [0.005, -0.74, 0.17]},
+    // {name: 'longboy', path: './models/parts/fork_04.obj', vector: [0.005, -0.74, 0.17]},
 ]
 var wheels = [
     {name: 'sensible', path: './models/parts/wheel_01.obj'},
@@ -308,6 +308,10 @@ function generate(update = true, pre_cof = null) {
                 );
             }
 
+            // const geo = new THREE.CylinderGeometry( 2, 2, 2, 32 );
+            // const mat = new THREE.MeshBasicMaterial( {color: 0x000000} );
+            // const cyl = new THREE.Mesh( geo, mat );
+
             const group = new THREE.Group();
 
             Object.values(model).forEach(object => {
@@ -364,6 +368,8 @@ function generate(update = true, pre_cof = null) {
             backmodel.add(back_backmodel)
             backmodel.add(front_backmodel)
             background_scene.add(backmodel);
+
+            // object.add(cyl);
 
             object.children[ 0 ].material = new THREE.MeshStandardMaterial( { color: 0x009900 } );
             object.children[ 0 ].geometry.computeBoundingBox();
