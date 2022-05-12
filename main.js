@@ -121,14 +121,19 @@ const color = new THREE.Color();
 const color2 = new THREE.Color();
 
 const LIGHT_BACKGROUND = 0xeeeeee;
-const LIGHT_MODEL = 0xffffff;
-const LIGHT_LINES = 0x000000;
+const LIGHT_MODEL = 0x2e08e3;
+const LIGHT_LINES = 0xffffff;
 const LIGHT_SHADOW = 0xc4c9cb;
 
 const DARK_BACKGROUND = 0x111111;
-const DARK_MODEL = 0x111111;
-const DARK_LINES = 0xb0bec5;
+const DARK_MODEL = 0xff4d06;
+const DARK_LINES = 0xffffff;
 const DARK_SHADOW = 0x2c2e2f;
+
+const GREEN_BACKGROUND = 0x111111;
+const GREEN_MODEL = 0x8800b5;
+const GREEN_LINES = 0xffffff;
+const GREEN_SHADOW = 0x2c2e2f;
 
 init();
 animate();
@@ -339,7 +344,7 @@ function generate(update = true, pre_cof = null) {
             // var front_backmodel = full_wheel.children[0].clone();
             // var back_backmodel = full_wheel.children[0].clone();
             const geometry = new THREE.CylinderGeometry( 0.6, 0.6, 0.01, 32 );
-            const material = new THREE.MeshBasicMaterial( {color: 0x000000} );
+            const material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
             const cylinder = new THREE.Mesh( geometry, material );
             cylinder.rotation.z = Math.PI / 2;
             var front_backmodel = cylinder.clone();
@@ -513,10 +518,10 @@ function animate() {
 
     } else if ( params.colors === 'CUSTOM' ) {
 
-        linesColor = params.lineColor;
-        modelColor = params.modelColor;
-        backgroundColor = params.backgroundColor;
-        shadowColor = params.shadowColor;
+        linesColor = GREEN_LINES;
+        modelColor = GREEN_MODEL;
+        backgroundColor = GREEN_BACKGROUND;
+        shadowColor = GREEN_SHADOW;
 
     }
 
