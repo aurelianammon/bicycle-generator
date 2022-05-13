@@ -87,14 +87,14 @@ var wheels = [
     {name: 'sensible', path: './models/parts/wheel_01.obj'},
     {name: 'wheeler', path: './models/parts/wheel_02.obj'},
     {name: 'vampire', path: './models/parts/wheel_03.obj'},
-    {name: 'disk', path: './models/parts/wheel_04.obj'},
-    {name: 'single', path: './models/parts/wheel_05.obj'},
+    // {name: 'disk', path: './models/parts/wheel_04.obj'},
+    // {name: 'single', path: './models/parts/wheel_05.obj'},
 ]
 var handlebars = [
     {name: 'deep', path: './models/parts/handlebar_01.obj'},
     {name: 'narrow', path: './models/parts/handlebar_02.obj'},
-    {name: 'wide', path: './models/parts/handlebar_03.obj'},
-    {name: 'bull', path: './models/parts/handlebar_04.obj'},
+    // {name: 'wide', path: './models/parts/handlebar_03.obj'},
+    // {name: 'bull', path: './models/parts/handlebar_04.obj'},
 ]
 
 // globals
