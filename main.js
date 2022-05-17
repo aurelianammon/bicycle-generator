@@ -76,25 +76,39 @@ var frames = [
             back_wheel: [0.01, 0, -1.01]
         }
     },
+    {name: 'long', path: './models/parts/frame_06_barcelona_long.obj',
+        positions: {
+            handlebar: [0, 0.912, 1.70],
+            fork: [0.01, 0.70, 1.728], // left, up, front
+            back_wheel: [0.01, 0, -1.01]
+        }
+    },
+    {name: 'detail', path: './models/parts/frame_07_barcelona_details.obj',
+        positions: {
+            handlebar: [0, 0.912, 0.646],
+            fork: [0, 0.67, 0.727], // left, up, front
+            back_wheel: [0.01, 0, -1.01]
+        }
+    },
 ]
 var forks = [
     {name: 'standart', path: './models/parts/fork_01.obj',vector: [0.005, -0.75, 0.065]},
     {name: 'extended', path: './models/parts/fork_02.obj',vector: [0.005, -0.75, 0.065]},
     {name: 'thin', path: './models/parts/fork_03.obj', vector: [0.005, -0.75, 0.065]},
-    // {name: 'longboy', path: './models/parts/fork_04.obj', vector: [0.005, -0.74, 0.17]},
+    {name: 'longboy', path: './models/parts/fork_04.obj', vector: [0.005, -0.74, 0.17]},
 ]
 var wheels = [
     {name: 'sensible', path: './models/parts/wheel_01.obj'},
     {name: 'wheeler', path: './models/parts/wheel_02.obj'},
     {name: 'vampire', path: './models/parts/wheel_03.obj'},
-    // {name: 'disk', path: './models/parts/wheel_04.obj'},
-    // {name: 'single', path: './models/parts/wheel_05.obj'},
+    {name: 'disk', path: './models/parts/wheel_04.obj'},
+    {name: 'single', path: './models/parts/wheel_05.obj'},
 ]
 var handlebars = [
     {name: 'deep', path: './models/parts/handlebar_01.obj'},
     {name: 'narrow', path: './models/parts/handlebar_02.obj'},
-    // {name: 'wide', path: './models/parts/handlebar_03.obj'},
-    // {name: 'bull', path: './models/parts/handlebar_04.obj'},
+    {name: 'wide', path: './models/parts/handlebar_03.obj'},
+    {name: 'bull', path: './models/parts/handlebar_04.obj'},
 ]
 
 // globals
