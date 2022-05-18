@@ -35,8 +35,8 @@ var gridXZ, angle_helper, handlebar_helper, fork_helper
 
 var angle, wheel_scale
 
-var helpers = true;
-var rotate = false;
+var helpers = false;
+var rotate = true;
 var debug = false;
 
 // ADD BIKEPARTS HERE IN THE ACCORDING ARRAY
@@ -140,7 +140,7 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0xffffff );
 
-    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
     renderer = new THREE.WebGLRenderer({
         antialias: true,
@@ -149,13 +149,13 @@ function init() {
     });
     renderer.autoClear = false;
     renderer.setClearColor( 0x000000, 0 );
-    renderer.setPixelRatio( window.devicePixelRatio * 2 );
+    renderer.setPixelRatio( window.devicePixelRatio * 1 );
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.shadowMap.enabled = true;
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild( renderer.domElement );
 
-    camera.position.set(1.5,1.5,1.5);
+    camera.position.set(-2.5,1,1.5);
 
     // Floor
     floor = new THREE.Mesh(
@@ -185,7 +185,7 @@ function init() {
 
     // camera controls
     controls = new OrbitControls( camera, renderer.domElement );
-    controls.target.set( -0.2, 0.3, 0.2 );
+    controls.target.set( 0, 0.3, 0 );
     if (!rotate) {
         document.getElementById ("rotate").textContent = "Start Rotation";
         controls.autoRotate = false;
@@ -1091,7 +1091,7 @@ function toggleHelpers (e) {
 
 function possibilities () {
     var number = frames.length * wheels.length * wheels.length * handlebars.length * forks.length;
-    document.getElementById ("number").textContent = number;
+    document.getElementById ("number").textContent = "1 of " + number;
 }
 
 var name;

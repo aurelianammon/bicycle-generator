@@ -7,7 +7,7 @@ body { margin: 0; }
 }
 
 #name {
-    margin-top: 10px;
+    margin-top: 5px;
     font-size: 36px;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
@@ -64,6 +64,7 @@ button {
   white-space: nowrap;
   word-wrap: break-word;
   margin-right: 5px;
+  margin-bottom: 5px;
 }
 
 button:hover {
@@ -94,10 +95,19 @@ button.black {
     color: white;
 }
 
+button.blue {
+  background-color: rgb(25, 0, 255);
+  color: white;
+}
+
 button:before {
   display: none;
 }
 
 button:-webkit-details-marker {
   display: none;
+}
+
+.dg.ac{
+  display: none !important;
 }
