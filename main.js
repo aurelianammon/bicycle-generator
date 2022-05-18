@@ -78,8 +78,8 @@ var frames = [
     },
     {name: 'long', path: './models/parts/frame_06_barcelona_long.obj',
         positions: {
-            handlebar: [0, 0.912, 1.70],
-            fork: [0.01, 0.70, 1.728], // left, up, front
+            handlebar: [0, 1.027, 1.635],
+            fork: [0.01, 0.688, 1.736], // left, up, front
             back_wheel: [0.01, 0, -1.01]
         }
     },
