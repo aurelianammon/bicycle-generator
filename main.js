@@ -83,11 +83,18 @@ var frames = [
             back_wheel: [0.01, 0, -1.01]
         }
     },
-    {name: 'detail', path: './models/parts/frame_07_barcelona_details.obj',
+    {name: 'ingria', path: './models/parts/frame_07_ingria.obj',
         positions: {
-            handlebar: [0, 0.912, 0.646],
-            fork: [0, 0.67, 0.727], // left, up, front
-            back_wheel: [0.01, 0, -1.01]
+            handlebar: [0, 0.91, 0.629],
+            fork: [0, 0.651, 0.735], // left, up, front
+            back_wheel: [0.01, -0.01, -1.05]
+        }
+    },
+    {name: 'ingriad', path: './models/parts/frame_07_ingria_details.obj',
+        positions: {
+            handlebar: [0, 0.91, 0.629],
+            fork: [0, 0.651, 0.735], // left, up, front
+            back_wheel: [0.01, -0.01, -1.05]
         }
     },
 ]
@@ -95,7 +102,8 @@ var forks = [
     {name: 'standart', path: './models/parts/fork_01.obj',vector: [0.005, -0.75, 0.065]},
     {name: 'extended', path: './models/parts/fork_02.obj',vector: [0.005, -0.75, 0.065]},
     {name: 'thin', path: './models/parts/fork_03.obj', vector: [0.005, -0.75, 0.065]},
-    {name: 'longboy', path: './models/parts/fork_04.obj', vector: [0.005, -0.74, 0.17]},
+    {name: 'straight', path: './models/parts/fork_05.obj',vector: [0.005, -0.75, 0.05]},
+    {name: 'thick', path: './models/parts/fork_06.obj', vector: [0.004, -0.74, 0.18]},
 ]
 var wheels = [
     {name: 'sensible', path: './models/parts/wheel_01.obj'},
@@ -103,12 +111,19 @@ var wheels = [
     {name: 'vampire', path: './models/parts/wheel_03.obj'},
     {name: 'disk', path: './models/parts/wheel_04.obj'},
     {name: 'single', path: './models/parts/wheel_05.obj'},
+    {name: 'zcsens', path: './models/parts/wheel_06.obj'},
+    {name: 'zcvampire', path: './models/parts/wheel_07.obj'},
+    {name: 'thin', path: './models/parts/wheel_09.obj'},
+    {name: 'highflange', path: './models/parts/wheel_10.obj'},
 ]
 var handlebars = [
     {name: 'deep', path: './models/parts/handlebar_01.obj'},
     {name: 'narrow', path: './models/parts/handlebar_02.obj'},
     {name: 'wide', path: './models/parts/handlebar_03.obj'},
     {name: 'bull', path: './models/parts/handlebar_04.obj'},
+    {name: 'rise', path: './models/parts/handlebar_05.obj'},
+    {name: 'low', path: './models/parts/handlebar_06.obj'},
+    {name: 'lower', path: './models/parts/handlebar_07.obj'},
 ]
 
 // globals
